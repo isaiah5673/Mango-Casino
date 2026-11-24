@@ -405,6 +405,9 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 @keyframes devglow{50%{box-shadow:0 0 0 1.5px #39ff7a inset,0 0 22px rgba(57,255,122,.85)}}
 .devrankbtn{background:#0a0f0a;color:#39ff7a;box-shadow:0 4px 0 #062a12;border:2px solid #1f6b3a}.devrankbtn.on{background:#39ff7a;color:#062a12;box-shadow:0 4px 0 #1f8f4a,0 0 18px rgba(57,255,122,.6)}
 #pTitle .ttl,#wdTitle .ttl{margin-right:4px}
+.devgive{display:grid;gap:6px;margin:14px 0 6px;padding:12px;border-radius:14px;background:rgba(0,0,0,.28);text-align:left}
+.devin{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:2px solid rgba(243,207,107,.45);background:rgba(0,0,0,.35);color:#fff;font:700 15px Inter,sans-serif}
+.devgive .devrow{flex-wrap:nowrap}@media(max-width:480px){.devgive .devrow{flex-wrap:wrap}.devin{flex:1 1 100%}}
 </style>
 </head>
 <body>
@@ -475,6 +478,11 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
       <button class="btn green" id="devAll">Unlock all goodies</button><button class="btn green" id="devGift">Reset daily gift</button>
       <button class="btn green" id="devTri">Mega Tripler 10 min</button><button class="btn red" id="devZero">Money to $0</button>
       <button class="btn red" id="devRank" aria-pressed="false" style="grid-column:1/-1">DEV rank: Off</button>
+    </div>
+    <div class="devgive"><b>Send money to a player</b>
+      <div class="devrow"><input id="devGiveUser" class="devin" placeholder="Username" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="16" aria-label="Player username">
+        <input id="devGiveAmt" class="devin" placeholder="Amount (10k, 1m…)" inputmode="text" autocomplete="off" aria-label="Amount to send"><button class="btn green" id="devGive">Send</button></div>
+      <div class="small" id="devGiveMsg" aria-live="polite">Adds money to their account. Everything else they have stays the same.</div>
     </div>
     <div class="row"><button class="btn alt" id="devLockBtn">Lock developer mode</button><button class="btn" id="devClose">Close</button></div>
   </div>
@@ -1030,9 +1038,13 @@ const Auth=(()=>{
   const accDoc=(db,u)=>db.doc('mango_accounts/'+u);
   function localSave(u){const o={};SAVE_KEYS.forEach(k=>{const v=LS.getItem(nsKey(u,k));if(v!==null)o[k]=v});return o}
   function applySave(u,save){SAVE_KEYS.forEach(k=>LS.removeItem(nsKey(u,k)));Object.entries(save||{}).forEach(([k,v])=>{if(SAVE_KEYS.includes(k)&&typeof v==='string')LS.setItem(nsKey(u,k),v)})}
-  async function pushNow(u){const db=await getDB();if(!db||!accounts[u])return false;const a=accounts[u],upd=+LS.getItem(nsKey(u,'_updated'))||Date.now();
+  async function pushNow(u){const db=await getDB();if(!db||!accounts[u])return false;const a=accounts[u];
+    try{const cur=await accDoc(db,u).get();const bonus=cur.exists?Math.floor(+(cur.data()||{}).bonus||0):0;
+      if(bonus>0&&u===sessionUser&&typeof setMoney==='function'){setMoney(money+bonus);toast(`🎁 An admin sent you ${fmt(bonus)}!`);try{Sound.big()}catch(e){}}
+      else if(bonus>0){let mm=0;try{mm=+JSON.parse(LS.getItem(nsKey(u,'casino-money'))||'0')||0}catch(e){}LS.setItem(nsKey(u,'casino-money'),JSON.stringify(mm+bonus))}}catch(e){}
+    const upd=+LS.getItem(nsKey(u,'_updated'))||Date.now();
     const sv=localSave(u);let m=0,pn=a.name,fr=null;try{m=Math.floor(+JSON.parse(sv['casino-money']||'0'))||0}catch(e){}try{const pr=JSON.parse(sv['casino-profile']||'{}');if(pr&&pr.name)pn=String(pr.name).slice(0,24);var dv=!!(pr&&pr.dev)}catch(e){}let ti=null;try{const sd=JSON.parse(sv['casino-shop']||'{}');fr=sd.eq||null;ti=sd.eqTitle||null}catch(e){}
-    try{await accDoc(db,u).set({name:a.name,salt:a.salt,alg:a.alg||'p',hash:a.hash,created:a.created||Date.now(),updated:upd,save:sv,money:m,pname:pn,frame:fr,title:ti,dev:typeof dv!=='undefined'&&dv});cloudOK=true;cloudMsg='';return true}
+    try{await accDoc(db,u).set({name:a.name,salt:a.salt,alg:a.alg||'p',hash:a.hash,created:a.created||Date.now(),updated:upd,save:sv,money:m,pname:pn,frame:fr,title:ti,dev:typeof dv!=='undefined'&&dv,bonus:0});cloudOK=true;cloudMsg='';return true}
     catch(e){cloudOK=false;cloudMsg=e&&e.code==='invalid_argument'?'readonly':'down';return false}finally{paint()}}
   let pushT=0,pushing=false,again=false;
   async function pushLoop(){if(pushing){again=true;return}pushing=true;try{do{again=false;if(sessionUser)await pushNow(sessionUser)}while(again)}finally{pushing=false}}
@@ -1082,6 +1094,7 @@ const Auth=(()=>{
         const hadLocal=!!accounts[u];accounts[u]=a;LS.setItem(ACC_KEY,JSON.stringify(accounts));
         if(c){const localUpd=+LS.getItem(nsKey(u,'_updated'))||0;if(!hadLocal||(c.updated||0)>=localUpd){applySave(u,c.save);LS.setItem(nsKey(u,'_updated'),String(c.updated||Date.now()))}else await pushNow(u);cloudOK=true}
         else if(cg.db)await pushNow(u);
+        setTimeout(pushLoop,1500);
         finish(u)}
     }catch(x){err('Something went wrong: '+(x&&x.message||x))}finally{$('auGo').disabled=false;$('auGo').textContent=mode==='new'?'Create account':mode==='reset'?'Set new password':'Log in'}}
   $('auGo').addEventListener('click',submit);
@@ -1103,12 +1116,17 @@ const Auth=(()=>{
   if(sessionUser){const u=sessionUser;cloudGet(u).then(({db,doc})=>{if(!db||sessionUser!==u)return;
       const localUpd=+LS.getItem(nsKey(u,'_updated'))||0;
       if(doc&&(doc.updated||0)>localUpd){applySave(u,doc.save);LS.setItem(nsKey(u,'_updated'),String(doc.updated));if(typeof reloadState==='function')reloadState();cloudOK=true;paint();toast('Loaded your latest progress')}
-      else pushLoop()})}
+      pushLoop()})}
   let guestOk=false;try{guestOk=sessionStorage.getItem('mc-guest')==='1'}catch(x){}
   if(!sessionUser&&!guestOk)open();
   async function top(){const db=await getDB();if(!db)return null;const q=await db.collection('mango_accounts').orderBy('money','desc').limit(25).get();
     return q.docs.map(d=>{const x=d.data()||{};return{id:d.id,name:String(x.pname||x.name||d.id),money:+x.money||0,frame:typeof x.frame==='string'?x.frame:null,title:typeof x.title==='string'?x.title:null,dev:x.dev===true}}).filter(r=>r.money>=0)}
-  return{open,top,get user(){return sessionUser}};
+  async function adminGive(name,amt){const db=await getDB();if(!db)throw new Error('Online accounts aren\'t reachable here');const u=String(name).trim().toLowerCase();
+    if(!/^[a-z0-9_]{3,16}$/.test(u))throw new Error('That isn\'t a valid username');const sn=await accDoc(db,u).get();if(!sn.exists)throw new Error(`No player called "${name}"`);
+    const d={...sn.data()};d.bonus=Math.floor(+d.bonus||0)+amt;d.money=Math.floor(+d.money||0)+amt;
+    if(u===sessionUser){setMoney(money+amt);return d.name||u}
+    await accDoc(db,u).set(d);return d.pname||d.name||u}
+  return{open,top,adminGive,get user(){return sessionUser}};
 })();
 
 let limboPreview=null;
@@ -1623,6 +1641,11 @@ $('nameSave').addEventListener('click',()=>{const v=$('nameIn').value.trim().sli
 $('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('nameSave').click()});
 const Dev=(()=>{let open=false;try{open=sessionStorage.getItem('mc-dev')==='1'}catch(e){}
   const rankLbl=()=>{const on=!!profile.dev;$('devRank').textContent='DEV rank: '+(on?'On':'Off');$('devRank').setAttribute('aria-pressed',on);$('devRank').classList.toggle('green',on);$('devRank').classList.toggle('red',!on)};
+  $('devGive').addEventListener('click',async()=>{const name=$('devGiveUser').value.trim(),amt=parseAmt($('devGiveAmt').value),M=$('devGiveMsg');
+    if(!name){M.textContent='Type a username first';return}if(!(amt>0)){M.textContent='Type an amount, like 10k or 1m';return}
+    $('devGive').disabled=true;M.textContent='Sending…';
+    try{const who=await Auth.adminGive(name,amt);M.textContent=`Sent ${fmt(amt)} to ${who}! They get it next time the game saves or they log in.`;Sound.cash();$('devGiveAmt').value=''}
+    catch(e){M.textContent=e&&e.message?e.message:'Couldn\'t send. Try again'}finally{$('devGive').disabled=false}});
   $('devRank').addEventListener('click',()=>{profile.dev=!profile.dev;saveProfile();renderProfile();rankLbl();toast(profile.dev?'DEV rank on: it replaces your title while it\'s on':'DEV rank off: your title is back');Sound.cash()});
   const show=()=>{rankLbl();$('devLock').hidden=open;$('devPanel').hidden=!open;$('devErr').hidden=true;$('devCode').value='';if(open)$('devMoney').value=Math.floor(money).toLocaleString('de-DE')};
   $('devKey').addEventListener('click',()=>{Sound.click();show();$('devDlg').hidden=false;setTimeout(()=>(open?$('devMoney'):$('devCode')).focus(),30)});
