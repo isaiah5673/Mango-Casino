@@ -972,6 +972,26 @@ const rand=()=>{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]
 const LS=(()=>{let ok=false;try{localStorage.setItem('mc-test','1');ok=localStorage.getItem('mc-test')==='1';localStorage.removeItem('mc-test')}catch(e){}
   const mem=new Map();return{ok,getItem:k=>{if(ok)try{return localStorage.getItem(k)}catch(e){}return mem.has(k)?mem.get(k):null},
     setItem:(k,v)=>{v=String(v);if(ok)try{localStorage.setItem(k,v);return}catch(e){}mem.set(k,v)},removeItem:k=>{if(ok)try{localStorage.removeItem(k)}catch(e){}mem.delete(k)}}})();
+// ---------- Firebase (Firestore REST) for the public website: same shape as Claude's db ----------
+const FIRE={projectId:'lucky-mango-cacino',apiKey:'AIzaSyDtVi6YkrHftfFqwR0c6dQ9KrV8KZ4sGgc'};
+function fireDB(){if(!FIRE.projectId||!FIRE.apiKey||typeof fetch!=='function')return null;
+  const base=`https://firestore.googleapis.com/v1/projects/${FIRE.projectId}/databases/(default)/documents`,key=`key=${encodeURIComponent(FIRE.apiKey)}`;
+  const enc=v=>v===null||v===undefined?{nullValue:null}:typeof v==='boolean'?{booleanValue:v}:typeof v==='number'?(Number.isInteger(v)&&Math.abs(v)<9e15?{integerValue:String(v)}:{doubleValue:v}):
+    typeof v==='string'?{stringValue:v}:Array.isArray(v)?{arrayValue:{values:v.map(enc)}}:{mapValue:{fields:encF(v)}};
+  const encF=o=>{const f={};for(const k in o)if(o[k]!==undefined)f[k]=enc(o[k]);return f};
+  const dec=x=>!x?null:'stringValue' in x?x.stringValue:'integerValue' in x?Number(x.integerValue):'doubleValue' in x?Number(x.doubleValue):'booleanValue' in x?x.booleanValue:
+    'mapValue' in x?decF(x.mapValue.fields||{}):'arrayValue' in x?(x.arrayValue.values||[]).map(dec):null;
+  const decF=f=>{const o={};for(const k in f)o[k]=dec(f[k]);return o};
+  const fail=async r=>{let m='';try{m=(await r.json()).error.message}catch(e){}const e=new Error(m||('HTTP '+r.status));e.code=r.status===403||r.status===400?'invalid_argument':'unavailable';throw e};
+  const snap=(id,fields)=>({id,exists:!!fields,data:()=>fields?decF(fields):undefined});
+  return{
+    doc(path){const id=path.split('/').pop();return{id,path,
+      async get(){const r=await fetch(`${base}/${path}?${key}`);if(r.status===404)return snap(id,null);if(!r.ok)await fail(r);const j=await r.json();return snap(id,j.fields||{})},
+      async set(obj){const r=await fetch(`${base}/${path}?${key}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:encF(obj)})});if(!r.ok)await fail(r)}}},
+    collection(c){let ob=null,lim=50;const q={orderBy(f,d){ob=[f,d];return q},limit(n){lim=n;return q},
+      async get(){const sq={from:[{collectionId:c}],limit:lim};if(ob)sq.orderBy=[{field:{fieldPath:ob[0]},direction:ob[1]==='desc'?'DESCENDING':'ASCENDING'}];
+        const r=await fetch(`${base}:runQuery?${key}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:sq})});if(!r.ok)await fail(r);
+        const docs=(await r.json()).filter(x=>x.document).map(x=>snap(x.document.name.split('/').pop(),x.document.fields||{}));return{docs,size:docs.length,empty:!docs.length}}};return q}}}
 const IN_CLAUDE=()=>{try{return !!(window.claude&&typeof window.claude.use==='function')}catch(e){return false}};
 const ACC_KEY='mc-accounts',SES_KEY='mc-session',LEGACY=['casino-money','casino-profile','casino-crash','casino-shop','casino-boost','casino-gift'];
 let accounts={};try{const a=JSON.parse(LS.getItem(ACC_KEY)||'{}');if(a&&typeof a==='object')accounts=a}catch(e){}
@@ -1005,7 +1025,7 @@ const Auth=(()=>{
   const SAVE_KEYS=['casino-money','casino-profile','casino-shop','casino-boost','casino-boost3','casino-gift','casino-crash'];
   let dbP=null,cloudOK=null,cloudMsg='';
   function getDB(){if(!dbP)dbP=new Promise(res=>{let done=false;const fin=v=>{if(!done){done=true;res(v)}};setTimeout(()=>fin(null),8000);
-      try{if(window.claude&&typeof window.claude.use==='function')window.claude.use('db').then(fin,()=>fin(null));else fin(null)}catch(e){fin(null)}});return dbP}
+      try{if(window.claude&&typeof window.claude.use==='function')window.claude.use('db').then(fin,()=>fin(null));else fin(fireDB())}catch(e){fin(null)}});return dbP}
   getDB();
   const accDoc=(db,u)=>db.doc('mango_accounts/'+u);
   function localSave(u){const o={};SAVE_KEYS.forEach(k=>{const v=LS.getItem(nsKey(u,k));if(v!==null)o[k]=v});return o}
@@ -1027,7 +1047,7 @@ const Auth=(()=>{
     $('auPassLbl').firstChild.textContent=m==='reset'?'New password':'Password';$('auForgot').hidden=m!=='login'||!Object.keys(accounts).length;
     $('auHint').textContent=m==='reset'?'Pick a new password for an account saved on this device. Your money and goodies stay.':m==='new'?(guestMem.size?'Your current progress will be saved into the new account.':'You start with $1.000 at Wood tier.'):'';
     const list=Object.values(accounts);
-    $('auWarn').hidden=LS.ok;if(!IN_CLAUDE())$('auSaveNote').textContent='Accounts are saved in this browser. Don\'t use a password you use anywhere else.';
+    $('auWarn').hidden=LS.ok;if(!IN_CLAUDE())$('auSaveNote').textContent='Accounts are saved online, so you can log in from any device. Don\'t use a password you use anywhere else.';
     $('auSaved').innerHTML=m==='login'&&list.length?'<span>On this device:</span>'+list.map(a=>{const s=document.createElement('span');s.textContent=a.name;return `<button type="button" class="auchip" data-u="${s.innerHTML}">${s.innerHTML}</button>`}).join(''):''}
   function open(m){setMode(m||(Object.keys(accounts).length?'login':'new'));$('auth').hidden=false;$('auUser').value='';$('auPass').value='';$('auPass2').value='';setTimeout(()=>$('auUser').focus(),50)}
   function finish(u){LS.setItem(SES_KEY,u);sessionUser=u;guestMem.clear();$('auth').hidden=true;paint();
@@ -1050,7 +1070,7 @@ const Auth=(()=>{
         let prof={};try{prof=JSON.parse(guestMem.get('casino-profile')||'{}')||{}}catch(x){}
         if(!prof.name||prof.name==='Player')prof.name=name;guestMem.set('casino-profile',JSON.stringify(prof));
         guestMem.forEach((v,k)=>LS.setItem(nsKey(u,k),v));LEGACY.forEach(k=>LS.removeItem(k));LS.setItem(nsKey(u,'_updated'),String(Date.now()));
-        const okCloud=await pushNow(u);finish(u);if(!okCloud)setTimeout(()=>toast(!IN_CLAUDE()?'Account saved on this browser':cloudMsg==='readonly'?'Account saved on this browser only: this link can\'t save online':'Couldn\'t reach online saving: account saved on this browser for now'),1600)}
+        const okCloud=await pushNow(u);finish(u);if(!okCloud)setTimeout(()=>toast(!IN_CLAUDE()?'Couldn\'t reach online saving: account saved on this browser for now':cloudMsg==='readonly'?'Account saved on this browser only: this link can\'t save online':'Couldn\'t reach online saving: account saved on this browser for now'),1600)}
       else if(mode==='reset'){const a=accounts[u];if(!a){err(`You can only reset a password on a device where you've logged in to "${name}" before`);return}
         if(pw!==$('auPass2').value.trim()){err('The two passwords don\'t match. Type them again');return}
         const acc={...a,salt:b64(crypto.getRandomValues(new Uint8Array(16)).buffer),alg:canSubtle()?'p':'s'};
