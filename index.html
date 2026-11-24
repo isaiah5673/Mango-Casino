@@ -494,8 +494,8 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
     <div class="devgrid">
       <button class="btn alt" data-dadd="10000">+$10.000</button><button class="btn alt" data-dadd="1000000">+$1.000.000</button>
       <button class="btn alt" data-dadd="100000000">+$100.000.000</button><button class="btn alt" data-dadd="1000000000">+$1.000.000.000</button>
-      <button class="btn green" id="devAll">Unlock all goodies</button><button class="btn green" id="devGift">Reset daily gift</button>
-      <button class="btn green" id="devTri">Mega Tripler 10 min</button><button class="btn red" id="devZero">Money to $0</button>
+      <button class="btn red" id="devAll" aria-pressed="false">Unlock all goodies: Off</button><button class="btn red" id="devGift" aria-pressed="false">Gift always ready: Off</button>
+      <button class="btn red" id="devTri" aria-pressed="false">Mega Tripler: Off</button><button class="btn red" id="devZero" aria-pressed="false">Money to $0: Off</button>
       <button class="btn red" id="devRank" aria-pressed="false" style="grid-column:1/-1">DEV rank: Off</button>
     </div>
     <div class="devgive"><b>Send money to a player</b>
@@ -1335,7 +1335,8 @@ try{const d=JSON.parse(Store.getItem('casino-shop')||'null');if(d&&Array.isArray
   const ok=(id,k)=>own.includes(id)&&itemById(id).kind===k?id:null;shopData={owned:own,eq:ok(d.eq,'frame'),eqTitle:ok(d.eqTitle,'title'),eqBack:ok(d.eqBack,'back')}}}catch(e){}
 const saveShop=()=>{try{Store.setItem('casino-shop',JSON.stringify(shopData))}catch(e){}};
 let boostUntil=0,triUntil=0;try{boostUntil=+Store.getItem('casino-boost')||0;triUntil=+Store.getItem('casino-boost3')||0}catch(e){}
-const boostMult=()=>{const n=Date.now();return n<triUntil?3:n<boostUntil?2:1};
+const devFlag=k=>{try{return !!(profile&&profile[k])}catch(e){return false}};
+const boostMult=()=>{const n=Date.now();return devFlag('devTri')||n<triUntil?3:n<boostUntil?2:1};
 const boostActive=()=>boostMult()>1;
 const boostEnd=()=>boostMult()===3?triUntil:boostUntil;
 let giftAt=0;try{giftAt=+Store.getItem('casino-gift')||0}catch(e){}
@@ -1491,7 +1492,7 @@ $('pWard').addEventListener('click',()=>{Sound.click();go('wardrobe')});
 $('pGoods').addEventListener('click',e=>{const b=e.target.closest('[data-kind]');if(!b)return;shopData[slotOf(b.dataset.kind)]=b.dataset.eq||null;saveShop();Sound.cash();renderProfile()});
 
 // ---- daily gift ----
-const giftLeft=()=>giftAt+GIFT_MS-Date.now();
+const giftLeft=()=>devFlag('devGift')?-1:giftAt+GIFT_MS-Date.now();
 function giftAmount(){const u=rand(),r=(a,b)=>Math.round((a+rand()*(b-a))/50)*50;
   return u<.6?r(500,2000):u<.9?r(2000,7500):u<.98?r(10000,25000):r(50000,100000)}
 function openGift(){Sound.click();if(giftLeft()>0){toast(`Next gift in ${clock(giftLeft())}`);return}
@@ -1510,7 +1511,7 @@ function tickClock(){const gl=giftLeft(),ready=gl<=0;
   document.querySelectorAll('.dotable').forEach(b=>b.classList.toggle('hasdot',ready));
   $('shGift').classList.toggle('ready',ready);$('shGiftBtn').disabled=!ready;$('shGiftBtn').textContent=ready?'Open':'Opened';
   $('shGiftTxt').innerHTML=ready?'<b class="gready">Ready to open!</b>':`Next gift in <b>${clock(gl)}</b>`;
-  const m=boostMult(),on=m>1,left=clock(boostEnd()-Date.now());$('boostPill').hidden=!on;if(on)$('boostPill').innerHTML=`⚡${m}× <b>${left}</b>`;
+  const m=boostMult(),on=m>1,left=m===3&&devFlag('devTri')?'∞':clock(boostEnd()-Date.now());$('boostPill').hidden=!on;if(on)$('boostPill').innerHTML=`⚡${m}× <b>${left}</b>`;
   $('boostPill').classList.toggle('tri',m===3);$('lBoost').hidden=!on;if(on)$('lBoost').innerHTML=`⚡ ${m}× wins for <b>${left}</b>`;
   if(!$('v-shop').hidden){$('shTimer').textContent=clock(msToMidnight());if(stockDay!==dayKey())renderShop();
     const n=Date.now();if([n<boostUntil,n<triUntil,giftLeft()<=0].join()!==boostSig)renderBoosts();
@@ -1695,7 +1696,7 @@ const Dev=(()=>{let open=false;try{open=sessionStorage.getItem('mc-dev')==='1'}c
     try{const who=await Auth.adminGive(name,amt);M.textContent=`Sent ${fmt(amt)} to ${who}! They get it next time the game saves or they log in.`;Sound.cash();$('devGiveAmt').value=''}
     catch(e){M.textContent=e&&e.message?e.message:'Couldn\'t send. Try again'}finally{$('devGive').disabled=false}});
   $('devRank').addEventListener('click',()=>{profile.dev=!profile.dev;saveProfile();renderProfile();rankLbl();toast(profile.dev?'DEV rank on: it replaces your title while it\'s on':'DEV rank off: your title is back');Sound.cash()});
-  const show=()=>{rankLbl();$('devLock').hidden=open;$('devPanel').hidden=!open;$('devErr').hidden=true;$('devCode').value='';if(open)$('devMoney').value=Math.floor(money).toLocaleString('de-DE')};
+  const show=()=>{rankLbl();togLbl();$('devLock').hidden=open;$('devPanel').hidden=!open;$('devErr').hidden=true;$('devCode').value='';if(open)$('devMoney').value=Math.floor(money).toLocaleString('de-DE')};
   $('devKey').addEventListener('click',()=>{Sound.click();show();$('devDlg').hidden=false;setTimeout(()=>(open?$('devMoney'):$('devCode')).focus(),30)});
   const tryCode=()=>{if($('devCode').value.trim()==='103050'){open=true;try{sessionStorage.setItem('mc-dev','1')}catch(e){}Sound.big();show();toast('Developer mode unlocked')}
     else{$('devErr').hidden=false;Sound.lose();$('devCode').value='';$('devCode').focus()}};
@@ -1707,10 +1708,19 @@ const Dev=(()=>{let open=false;try{open=sessionStorage.getItem('mc-dev')==='1'}c
   $('devSet').addEventListener('click',()=>{const v=parseAmt($('devMoney').value);if(v>=0&&String($('devMoney').value).trim())setM(v)});
   $('devMoney').addEventListener('keydown',e=>{if(e.key==='Enter')$('devSet').click()});
   document.querySelectorAll('[data-dadd]').forEach(b=>b.addEventListener('click',()=>setM(money+ +b.dataset.dadd)));
-  $('devZero').addEventListener('click',()=>{money=0;setMoney(0);$('devMoney').value='0';Sound.click()});
-  $('devAll').addEventListener('click',()=>{shopData.owned=ALLITEMS.map(x=>x.id);saveShop();renderProfile();if(!$('v-shop').hidden)renderShop();toast('Every goodie unlocked. Pick them in the Wardrobe');Sound.big()});
-  $('devGift').addEventListener('click',()=>{giftAt=0;Store.setItem('casino-gift','0');tickClock();toast('Daily gift is ready');Sound.cash()});
-  $('devTri').addEventListener('click',()=>{triUntil=Math.max(Date.now(),triUntil)+600000;Store.setItem('casino-boost3',String(triUntil));tickClock();toast('Mega Tripler on for 10 minutes');Sound.big()});
+  const TOG={devAll:'Unlock all goodies',devGift:'Gift always ready',devTri:'Mega Tripler',devZero:'Money to $0'};
+  const togLbl=()=>Object.entries(TOG).forEach(([k,n])=>{const on=k==='devZero'?typeof profile.devZeroSaved==='number':!!profile[k],b=$(k);
+    b.textContent=n+': '+(on?'On':'Off');b.setAttribute('aria-pressed',on);b.classList.toggle('green',on);b.classList.toggle('red',!on)});
+  const after=()=>{saveProfile();renderProfile();if(!$('v-shop').hidden)renderShop();if(!$('v-wardrobe').hidden)renderGoods(tierOf(money));tickClock();togLbl()};
+  $('devZero').addEventListener('click',()=>{if(typeof profile.devZeroSaved==='number'){const back=profile.devZeroSaved;delete profile.devZeroSaved;setMoney(money+back);toast(`Money to $0 off: ${fmt(back)} is back`);Sound.cash()}
+    else{profile.devZeroSaved=Math.floor(money);setMoney(0);toast('Money to $0 on. Turn it off to get your money back');Sound.click()}
+    $('devMoney').value=Math.floor(money).toLocaleString('de-DE');after()});
+  $('devAll').addEventListener('click',()=>{if(profile.devAll){const keep=Array.isArray(profile.devAllBackup)?profile.devAllBackup:[];shopData.owned=keep.filter(x=>itemById(x));
+      if(shopData.eq&&!shopData.owned.includes(shopData.eq))shopData.eq=null;if(shopData.eqTitle&&!shopData.owned.includes(shopData.eqTitle))shopData.eqTitle=null;if(shopData.eqBack&&!shopData.owned.includes(shopData.eqBack))shopData.eqBack=null;
+      profile.devAll=false;delete profile.devAllBackup;saveShop();applyBack();toast('Unlock all off: back to the goodies you bought');Sound.click()}
+    else{profile.devAllBackup=shopData.owned.slice();profile.devAll=true;shopData.owned=ALLITEMS.map(x=>x.id);saveShop();toast('Every goodie unlocked. Pick them in the Wardrobe');Sound.big()}after()});
+  $('devGift').addEventListener('click',()=>{profile.devGift=!profile.devGift;toast(profile.devGift?'Daily gift is always ready now':'Daily gift is back to every 24 hours');Sound.cash();after()});
+  $('devTri').addEventListener('click',()=>{profile.devTri=!profile.devTri;toast(profile.devTri?'Mega Tripler on: every win pays triple until you turn it off':'Mega Tripler off');profile.devTri?Sound.big():Sound.click();after()});
   return{}})();
 $('clearBtn').addEventListener('click',()=>{Sound.click();$('clearDlg').hidden=false;$('clearNo').focus()});
 $('clearNo').addEventListener('click',()=>{$('clearDlg').hidden=true});
