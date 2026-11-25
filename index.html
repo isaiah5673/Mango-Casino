@@ -2999,14 +2999,21 @@ const Board=(()=>{let busy=false;const esc=t=>{const s=document.createElement('s
     const mine=rows.findIndex(r=>r.id===me);
     $('lbNote').textContent=!me?'Log in to an account to get on the leaderboard. Guests aren\'t listed.':mine<0?'You\'re not in the top 25 yet. Keep playing!':`You're #${mine+1}!`}
   $('lbRefresh').addEventListener('click',()=>{Sound.click();load()});return{load}})();
-const Chat=(()=>{let msgs=[],lastT=0,timer=0,running=false,lastSend=0,loaded=false,tipTo=null;
+const Chat=(()=>{let msgs=[],lastT=0,timer=0,running=false,lastSend=0,loaded=false,tipTo=null;const live={};
   const esc=t=>{const s=document.createElement('span');s.textContent=t;return s.innerHTML};
   const BAD=['fuck','shit','bitch','asshole','bastard','dick','pussy','cunt','nigger','nigga','faggot','retard','slut','whore'];
   const clean=t=>{let o=String(t);BAD.forEach(w=>{o=o.replace(new RegExp(w,'gi'),m=>'*'.repeat(m.length))});return o};
   const L=()=>$('chList');
+  // show each player's rank as it is now, not as it was when the message was sent
+  const cur=m=>{if(m.user&&m.user===Auth.user)return{...m,tier:tierOf(money),dev:!!profile.dev,name:Auth.myName()};const l=live[m.user];return l?{...m,tier:l.tier,dev:l.dev,name:l.name||m.name}:m};
+  async function refreshLive(force){const db=await Auth.getDB();if(!db)return;const now=Date.now(),users=[...new Set(msgs.filter(m=>!m.sys&&m.user&&m.user!==Auth.user).map(m=>m.user))];let changed=false;
+    await Promise.all(users.map(async u=>{const l=live[u];if(!force&&l&&now-l.at<60000)return;
+      try{const sn=await db.doc('mango_accounts/'+u).get();if(!sn.exists)return;const x=sn.data()||{},n={tier:tierOf(Math.max(0,+x.money||0)),dev:x.dev===true,name:String(x.pname||x.name||u).slice(0,24),at:now};
+        if(!l||l.tier!==n.tier||l.dev!==n.dev||l.name!==n.name)changed=true;live[u]=n}catch(e){}}));
+    if(changed)render()}
   const tierIdx=m=>Math.max(0,Math.min(TIERS.length-1,(m.tier|0)));
-  const nameBtn=(m,tag)=>{const t=tierIdx(m);return m.dev?`<${tag} class="chname rb" data-u="${esc(m.user)}">${esc(m.name)}</${tag}>`:`<${tag} class="chname" style="color:${TIERS[t].c[0]}" data-u="${esc(m.user)}">${esc(m.name)}</${tag}>`};
-  const rankTag=m=>{const t=tierIdx(m);return m.dev?DEVTAG:`<span class="chrank" style="color:${TIERS[t].c[0]};border-color:${TIERS[t].c[0]}">${TIERS[t].name}</span>`};
+  const nameBtn=(m,tag)=>{m=cur(m);const t=tierIdx(m);return m.dev?`<${tag} class="chname rb" data-u="${esc(m.user)}">${esc(m.name)}</${tag}>`:`<${tag} class="chname" style="color:${TIERS[t].c[0]}" data-u="${esc(m.user)}">${esc(m.name)}</${tag}>`};
+  const rankTag=m=>{m=cur(m);const t=tierIdx(m);return m.dev?DEVTAG:`<span class="chrank" style="color:${TIERS[t].c[0]};border-color:${TIERS[t].c[0]}">${TIERS[t].name}</span>`};
   const hm=t=>{const d=new Date(t);return d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})};
   function row(m){if(m.sys)return `<li class="chmsg sys">${esc(clean(m.text))}</li>`;
     return `<li class="chmsg${m.user===Auth.user?' mine':''}"><div class="chhead">${nameBtn(m,'button')}${rankTag(m)}<time>${hm(m.t)}</time></div><div class="chtext">${esc(clean(m.text))}</div></li>`}
@@ -3023,7 +3030,7 @@ const Chat=(()=>{let msgs=[],lastT=0,timer=0,running=false,lastSend=0,loaded=fal
     r.docs.forEach(d=>{if(have.has(d.id))return;const x=d.data()||{};if(typeof x.text!=='string')return;
       msgs.push({id:d.id,user:String(x.user||''),name:String(x.name||x.user||'Player').slice(0,24),text:x.text.slice(0,200),t:+x.t||0,tier:+x.tier||0,dev:x.dev===true,sys:x.sys===true});fresh=true});
     msgs.sort((a,b)=>a.t-b.t);if(msgs.length>120)msgs=msgs.slice(-120);msgs.forEach(m=>{if(m.t>lastT)lastT=m.t});
-    if(fresh||!loaded){render()}loaded=true;return true}
+    if(fresh||!loaded){render()}loaded=true;refreshLive();return true}
   async function loop(){if($('v-chat').hidden){running=false;return}
     if(document.visibilityState!=='hidden'){try{await fetchNew();note('Tap a player\'s name to tip them.')}catch(e){note('Couldn\'t reach the chat. Trying again…')}}
     timer=setTimeout(loop,4000)}
@@ -3037,7 +3044,7 @@ const Chat=(()=>{let msgs=[],lastT=0,timer=0,running=false,lastSend=0,loaded=fal
     catch(e){note(e&&e.code==='invalid_argument'?'Chat is turned off on the server right now.':'Couldn\'t send. Try again.')}finally{$('chSend').disabled=!Auth.user;$('chIn').focus()}}
   $('chSend').addEventListener('click',send);$('chIn').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();send()}});
   // ---- tipping ----
-  function openTip(m){tipTo=m;$('tipWho').innerHTML=nameBtn(m,'span')+rankTag(m);$('tipAmt').value='';const me=Auth.user;
+  function openTip(m){tipTo=cur(m);$('tipWho').innerHTML=nameBtn(m,'span')+rankTag(m);refreshLive(true).then(()=>{if(!$('tipDlg').hidden&&tipTo&&tipTo.user===m.user){tipTo=cur(m);$('tipWho').innerHTML=nameBtn(m,'span')+rankTag(m)}});$('tipAmt').value='';const me=Auth.user;
     const why=!me?'Log in to an account to tip players.':m.user===me?'That\'s you! Tap someone else to tip them.':`You have ${fmt(money)}.`;
     $('tipMsg').textContent=why;const ok=!!me&&m.user!==me;$('tipGo').disabled=!ok;$('tipAmt').disabled=!ok;$('tipDlg').querySelectorAll('[data-tip]').forEach(b=>b.disabled=!ok);
     $('tipDlg').hidden=false;Sound.click();if(ok)$('tipAmt').focus()}
