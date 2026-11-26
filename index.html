@@ -2168,17 +2168,19 @@ const Pool=(()=>{
     stake=bets.pool;rack();groups={you:null,ai:null};playing=true;turn='you';hint=true;aim=0;
     say('pMsg',`Your break! AI level: ${skillName()}. Aim at the rack and shoot hard`);Sound.cash();controls();draw()}
   let shotT0=0,aiTimer=0,aiAt=0;
-  // the AI gets better the more you bet: under $1M easy, $1M normal, $6M hard, $10M+ extreme
-  const level=()=>stake>=10e6?3:stake>=6e6?2:stake>=1e6?1:0;
-  const skill=()=>[0.35,0.7,0.88,1][level()];
-  const skillName=()=>['Easy','Normal','Hard','Extreme'][level()];
+  // AI level by bet: under $6M hard, $6M and up extreme
+  const level=()=>stake>=6e6?1:0;
+  const skill=()=>[0.9,1][level()];
+  const skillName=()=>['Hard','Extreme'][level()];
+  // pockets play a little tighter on your shots and a little kinder on the AI's
+  const pocketR=()=>simming||turn==='ai'?PR+4:PR-(level()?6:5);
   const next=()=>document.hidden?setTimeout(tick,16):requestAnimationFrame(tick);
-  function shoot(power){if(moving)return;locked=false;const c=cue();if(c.in)respotCue();potted=[];if(!isFinite(aim))aim=0;c.vx=Math.cos(aim)*power*0.27;c.vy=Math.sin(aim)*power*0.27;moving=true;shotT0=performance.now();Sound.cue();controls();next()}
+  function shoot(power){if(moving)return;locked=false;const c=cue();if(c.in)respotCue();potted=[];if(!isFinite(aim))aim=0;if(turn==='you')aim+=(rand()-0.5)*(level()?0.04:0.026);c.vx=Math.cos(aim)*power*0.27;c.vy=Math.sin(aim)*power*0.27;moving=true;shotT0=performance.now();Sound.cue();controls();next()}
   const scheduleAI=ms=>{clearTimeout(aiTimer);aiAt=performance.now();aiTimer=setTimeout(aiTurn,ms)};
-  let lastClack=0;const clack=v=>{const t=performance.now();if(t-lastClack>35){Sound.clack(v);lastClack=t}};
+  let lastClack=0,simming=false;const clack=v=>{if(simming)return;const t=performance.now();if(t-lastClack>35){Sound.clack(v);lastClack=t}};
   function physics(){const live=balls.filter(b=>!b.in);
     for(const o of live){o.x+=o.vx;o.y+=o.vy;
-      for(const [px,py] of POCKETS)if(Math.hypot(o.x-px,o.y-py)<PR-1){o.in=true;o.vx=o.vy=0;potted.push(o.n);Sound.pocket();break}
+      for(const [px,py] of POCKETS)if(Math.hypot(o.x-px,o.y-py)<pocketR()){o.in=true;o.vx=o.vy=0;potted.push(o.n);if(!simming)Sound.pocket();break}
       if(o.in)continue;
       if(o.x<L+BR){o.x=L+BR;o.vx=-o.vx*0.78;clack(Math.abs(o.vx)/6)}if(o.x>Rr-BR){o.x=Rr-BR;o.vx=-o.vx*0.78;clack(Math.abs(o.vx)/6)}
       if(o.y<T+BR){o.y=T+BR;o.vy=-o.vy*0.78;clack(Math.abs(o.vy)/6)}if(o.y>B-BR){o.y=B-BR;o.vy=-o.vy*0.78;clack(Math.abs(o.vy)/6)}}
@@ -2220,18 +2222,27 @@ const Pool=(()=>{
       if(Math.hypot(x1+vx*t-b.x,y1+vy*t-b.y)<BR*2)return false}return true}
   function aiTurn(){if(!playing||turn!=='ai'||moving)return;aiBusy=true;aiAt=performance.now();try{
     const c=cue();const targets=balls.filter(b=>!b.in&&b.n!==0&&(groups.ai?(left('ai')===0?b.n===8:kind(b.n)===groups.ai):b.n!==8));
-    let best=null;
-    for(const t of targets)for(const [px,py] of POCKETS){
+    const mine=n=>n!==0&&(groups.ai?(left('ai')===0?n===8:kind(n)===groups.ai):n!==8);
+    const cands=(cx,cy,list)=>{const out=[];for(const t of list)for(const [px,py] of POCKETS){
       const a2=Math.atan2(py-t.y,px-t.x),gx=t.x-Math.cos(a2)*BR*2,gy=t.y-Math.sin(a2)*BR*2;
-      const a1=Math.atan2(gy-c.y,gx-c.x);let cut=Math.abs(a1-a2);if(cut>Math.PI)cut=Math.PI*2-cut;if(cut>0.95+0.4*skill())continue;
-      if(!clearPath(c.x,c.y,gx,gy,[c,t])||!clearPath(t.x,t.y,px,py,[t]))continue;
-      const d1=Math.hypot(gx-c.x,gy-c.y),d2=Math.hypot(px-t.x,py-t.y),score=cut*1.6+d1/350+d2/300;
-      if(!best||score<best.score)best={score,a:a1,d:d1+d2}}
+      const a1=Math.atan2(gy-cy,gx-cx);let cut=Math.abs(a1-a2);if(cut>Math.PI)cut=Math.PI*2-cut;if(cut>1.35)continue;
+      const cb={x:cx,y:cy};if(!clearPath(cx,cy,gx,gy,[cue(),t,cb])||!clearPath(t.x,t.y,px,py,[t]))continue;
+      const d1=Math.hypot(gx-cx,gy-cy),d2=Math.hypot(px-t.x,py-t.y);out.push({score:cut*1.6+d1/350+d2/300,a:a1,d:d1+d2,t:t.n})}
+      return out.sort((p,q)=>p.score-q.score)};
+    const sim=(a,pw)=>{const save=balls,saveP=potted;simming=true;
+      try{balls=save.map(b=>({...b}));potted=[];const c2=balls.find(b=>b.n===0);c2.vx=Math.cos(a)*pw*0.27;c2.vy=Math.sin(a)*pw*0.27;
+        for(let k=0;k<3000&&balls.some(b=>!b.in&&(b.vx||b.vy));k++)physics();
+        const got=potted.slice(),cueIn=got.includes(0),c3=balls.find(b=>b.n===0);let next=0;
+        if(!cueIn){const rest=balls.filter(b=>!b.in&&mine(b.n));const saveB2=balls;next=cands(c3.x,c3.y,rest).filter(x=>x.score<1.6).length;balls=saveB2}
+        return{got,cueIn,next}}finally{balls=save;potted=saveP;simming=false}};
+    const k=skill(),top=cands(c.x,c.y,targets).slice(0,level()?9:5),pows=level()?[-14,0,14,26]:[-10,0,14];
+    let best=null,bestV=-1e9;
+    for(const cd of top)for(const dp of pows){const pw=Math.min(95,Math.max(28,25+cd.d/9+dp));const r=sim(cd.a,pw);
+      const ok=!r.cueIn&&r.got.some(mine)&&!(r.got.includes(8)&&!(groups.ai&&left('ai')===0)),bad=r.cueIn||r.got.includes(8)&&!(groups.ai&&left('ai')===0);
+      const v=(ok?100:0)-(bad?200:0)+r.next*8-cd.score*4;if(v>bestV){bestV=v;best={a:cd.a,pw}}}
     let power;
-    const k=skill();
-    if(best&&rand()<0.25*(1-k))best=null; // easier AI sometimes just whacks at the nearest ball
-    if(best){aim=best.a+(rand()-0.5)*(0.13-0.115*k);power=Math.min(90,Math.max(30,25+best.d/9+(rand()-0.5)*(20-18*k)))}
-    else{const t=targets.sort((p,q)=>Math.hypot(p.x-c.x,p.y-c.y)-Math.hypot(q.x-c.x,q.y-c.y))[0];aim=t?Math.atan2(t.y-c.y,t.x-c.x):rand()*6.28;power=70}
+    if(best){aim=best.a+(rand()-0.5)*(level()?0.002:0.008);power=best.pw}
+    else{const t=targets.slice().sort((p,q)=>Math.hypot(p.x-c.x,p.y-c.y)-Math.hypot(q.x-c.x,q.y-c.y))[0];aim=t?Math.atan2(t.y-c.y,t.x-c.x):rand()*6.28;power=60}
     if(!isFinite(aim))aim=rand()*6.28;if(!isFinite(power))power=60;
     say('pMsg','The AI is lining up a shot…','');draw();
     clearTimeout(aiTimer);aiTimer=setTimeout(()=>{aiBusy=false;if(playing&&turn==='ai'&&!moving)shoot(power)},1100)}
