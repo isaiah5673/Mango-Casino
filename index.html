@@ -2038,8 +2038,12 @@ const Pool=(()=>{
   $('pPower').addEventListener('input',draw);
   function start(){if(playing)return;if(!take(bets.pool)){say('pMsg','Not enough money for that bet','lose');return}
     stake=bets.pool;rack();groups={you:null,ai:null};playing=true;turn='you';hint=true;aim=0;
-    say('pMsg','Your break! Aim at the rack and shoot hard');Sound.cash();controls();draw()}
+    say('pMsg',`Your break! AI level: ${skillName()}. Aim at the rack and shoot hard`);Sound.cash();controls();draw()}
   let shotT0=0,aiTimer=0,aiAt=0;
+  // the AI gets better the more you bet: under $3M easy, $3M normal, $6M medium, $13M+ hard
+  const level=()=>stake>=13e6?3:stake>=6e6?2:stake>=3e6?1:0;
+  const skill=()=>[0.35,0.7,0.85,1][level()];
+  const skillName=()=>['Easy','Normal','Medium','Hard'][level()];
   const next=()=>document.hidden?setTimeout(tick,16):requestAnimationFrame(tick);
   function shoot(power){if(moving)return;locked=false;const c=cue();if(c.in)respotCue();potted=[];if(!isFinite(aim))aim=0;c.vx=Math.cos(aim)*power*0.27;c.vy=Math.sin(aim)*power*0.27;moving=true;shotT0=performance.now();Sound.cue();controls();next()}
   const scheduleAI=ms=>{clearTimeout(aiTimer);aiAt=performance.now();aiTimer=setTimeout(aiTurn,ms)};
@@ -2091,12 +2095,14 @@ const Pool=(()=>{
     let best=null;
     for(const t of targets)for(const [px,py] of POCKETS){
       const a2=Math.atan2(py-t.y,px-t.x),gx=t.x-Math.cos(a2)*BR*2,gy=t.y-Math.sin(a2)*BR*2;
-      const a1=Math.atan2(gy-c.y,gx-c.x);let cut=Math.abs(a1-a2);if(cut>Math.PI)cut=Math.PI*2-cut;if(cut>1.25)continue;
+      const a1=Math.atan2(gy-c.y,gx-c.x);let cut=Math.abs(a1-a2);if(cut>Math.PI)cut=Math.PI*2-cut;if(cut>0.95+0.4*skill())continue;
       if(!clearPath(c.x,c.y,gx,gy,[c,t])||!clearPath(t.x,t.y,px,py,[t]))continue;
       const d1=Math.hypot(gx-c.x,gy-c.y),d2=Math.hypot(px-t.x,py-t.y),score=cut*1.6+d1/350+d2/300;
       if(!best||score<best.score)best={score,a:a1,d:d1+d2}}
     let power;
-    if(best){aim=best.a+(rand()-0.5)*0.05;power=Math.min(90,Math.max(30,25+best.d/9))}
+    const k=skill();
+    if(best&&rand()<0.25*(1-k))best=null; // easier AI sometimes just whacks at the nearest ball
+    if(best){aim=best.a+(rand()-0.5)*(0.13-0.115*k);power=Math.min(90,Math.max(30,25+best.d/9+(rand()-0.5)*(20-18*k)))}
     else{const t=targets.sort((p,q)=>Math.hypot(p.x-c.x,p.y-c.y)-Math.hypot(q.x-c.x,q.y-c.y))[0];aim=t?Math.atan2(t.y-c.y,t.x-c.x):rand()*6.28;power=70}
     if(!isFinite(aim))aim=rand()*6.28;if(!isFinite(power))power=60;
     say('pMsg','The AI is lining up a shot…','');draw();
