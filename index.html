@@ -28,6 +28,22 @@ button{font-family:inherit}
 .btn:focus-visible,.bill:focus-visible,.spot:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .sign{font-family:"Playfair Display",Georgia,serif;font-weight:900}
 /* home */
+/* ===== Thanksgiving look (turn off with SEASON='' in the script) ===== */
+body.tg{background:linear-gradient(180deg,#24102e 0%,#4a1c35 22%,#8a3426 48%,#d2662a 72%,#f0a050 100%) fixed}
+body.tg .home{background:linear-gradient(180deg,#24102e 0%,#4a1c35 22%,#8a3426 48%,#d2662a 72%,#f0a050 100%)}
+body.tg .home,body.tg main>section>h2,body.tg main>section>p{text-shadow:0 1px 3px rgba(0,0,0,.75),0 0 10px rgba(0,0,0,.35)}
+.scene{position:fixed;left:0;right:0;bottom:0;height:min(62vh,640px);z-index:-1;pointer-events:none}
+.scene svg{width:100%;height:100%;display:block}
+.scene .cloud{animation:cloudmove 90s linear infinite}
+@keyframes cloudmove{from{transform:translateX(-300px)}to{transform:translateX(1900px)}}
+@media (prefers-reduced-motion:reduce){.scene .cloud{animation:none}}
+body.tg .top{background:rgba(40,16,4,.93);border-bottom-color:rgba(232,163,23,.4)}
+.leaves{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.leaves i{position:absolute;top:-40px;display:block;width:var(--s);height:var(--s);opacity:.75;animation:leaffall var(--d) linear var(--w) infinite}
+.leaves i svg{width:100%;height:100%;display:block;animation:leafsway calc(var(--d)/4) ease-in-out infinite alternate}
+@keyframes leaffall{from{transform:translate(0,-40px) rotate(0)}to{transform:translate(var(--x),110vh) rotate(var(--r))}}
+@keyframes leafsway{from{transform:translateX(-14px) rotate(-18deg)}to{transform:translateX(14px) rotate(18deg)}}
+@media (prefers-reduced-motion:reduce){.leaves{display:none}}
 .home{position:fixed;inset:0;z-index:20;display:grid;justify-items:center;align-content:start;padding:clamp(10px,3vh,28px) 20px 20px;background:radial-gradient(90% 70% at 50% 30%,#1f7552 0%,#0b3524 70%,#06201a 100%);overflow:auto}
 .marquee{text-align:center;max-width:560px;width:100%}
 .fan{position:relative;height:150px;margin:-14px auto -24px;width:240px;transform:scale(.78)}
@@ -1638,6 +1654,47 @@ function tickClock(){const gl=giftLeft(),ready=gl<=0;
     else{const a=$('shLeft_dbl'),b=$('shLeft_tri');if(a)a.textContent=clock(boostUntil-n);if(b)b.textContent=clock(triUntil-n)}}}
 setInterval(tickClock,1000);
 
+// ---------- season ----------
+// 'thanksgiving' = autumn background, falling leaves and Thanksgiving songs.
+// Set to '' to go back to the normal green casino and the original songs.
+const SEASON='thanksgiving';
+(function(){if(SEASON!=='thanksgiving')return;document.body.classList.add('tg');
+  const leaf=c=>`<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0-9L2-4L6-6L5-1L9 0L5 2L6 6L1 4L0 9L-1 4L-6 6L-5 2L-9 0L-5-1L-6-6L-2-4z" fill="${c}" stroke="rgba(60,20,0,.5)" stroke-width=".7" stroke-linejoin="round"/><path d="M0-6V9" stroke="rgba(60,20,0,.45)" stroke-width=".7"/></svg>`;
+  const make=()=>{const box=document.createElement('div');box.className='leaves';box.setAttribute('aria-hidden','true');const C=['#c0392b','#e8a317','#d9661f','#a0461b','#f0b43a'];
+    box.innerHTML=Array.from({length:16},(_,i)=>`<i style="left:${(i*6.3+Math.random()*5)%100}%;--s:${16+Math.random()*16}px;--d:${11+Math.random()*10}s;--w:${-Math.random()*20}s;--x:${(Math.random()-.5)*160}px;--r:${(Math.random()<.5?-1:1)*(240+Math.random()*360)}deg">${leaf(C[i%C.length])}</i>`).join('');return box};
+  // cartoon autumn countryside: sunset, hills, fall trees, a barn, a fence, pumpkins and hay
+  let seed=7;const R=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+  const oak=(x,y,k,cols)=>{const c=cols||['#e8a317','#d9661f','#c0392b','#f0b43a'];let g=`<g transform="translate(${x} ${y}) scale(${k})"><path d="M-5 0 L-4-38 Q0-44 4-38 L5 0z" fill="#5a2e12"/><path d="M0-30l-14-14M2-34l12-12" stroke="#5a2e12" stroke-width="4" stroke-linecap="round"/>`;
+    const blobs=[[-22,-52,20],[20,-54,20],[0,-70,24],[-10,-82,17],[12,-80,17],[0,-50,18]];
+    blobs.forEach(([bx,by,r],i)=>{g+=`<circle cx="${bx}" cy="${by}" r="${r}" fill="${c[(i+Math.floor(R()*4))%c.length]}" stroke="rgba(60,20,0,.35)" stroke-width="2"/>`});
+    g+=`<circle cx="-8" cy="-78" r="6" fill="#fff" opacity=".18"/></g>`;return g};
+  const pine=(x,y,k)=>`<g transform="translate(${x} ${y}) scale(${k})"><rect x="-4" y="-12" width="8" height="12" fill="#4a2a12"/><path d="M0-90L-22-50H-12L-28-24H-14L-32 0H32L14-24H28L12-50H22z" fill="#2f5a2a" stroke="#1d3a18" stroke-width="2" stroke-linejoin="round"/></g>`;
+  const pumpkin=(x,y,k)=>`<g transform="translate(${x} ${y}) scale(${k})"><ellipse cx="0" cy="-12" rx="17" ry="12" fill="#f08a24" stroke="#8b3a0e" stroke-width="2"/><path d="M0-24V0M-8-23c-4 6-4 16 0 22M8-23c4 6 4 16 0 22" stroke="#b4521a" stroke-width="1.8" fill="none"/><path d="M0-23c0-5 2-8 5-10" stroke="#3d7a1e" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M4-30c5-3 10-1 10 1-5 3-8 1-10-1z" fill="#5aa52b"/></g>`;
+  const hay=(x,y,k)=>`<g transform="translate(${x} ${y}) scale(${k})"><rect x="-26" y="-28" width="52" height="28" rx="6" fill="#e8b84a" stroke="#9a6a18" stroke-width="2"/><path d="M-18-28v28M-6-28v28M6-28v28M18-28v28" stroke="#c4922a" stroke-width="2"/><path d="M-26-14h52" stroke="#9a6a18" stroke-width="2"/></g>`;
+  const cloud=(x,y,k,d)=>`<g class="cloud" style="animation-delay:${d}s"><g transform="translate(${x} ${y}) scale(${k})" fill="#ffd7b0" opacity=".55"><ellipse cx="0" cy="0" rx="60" ry="18"/><circle cx="-20" cy="-12" r="22"/><circle cx="16" cy="-18" r="26"/><circle cx="44" cy="-6" r="16"/></g></g>`;
+  let back='',mid='',front='';
+  for(let i=0;i<14;i++){const x=40+i*118+R()*40;back+=R()<.35?pine(x,300+R()*14,.55):oak(x,304+R()*12,.6,['#c96a2a','#b85a24','#a8441a','#d98a3a'])}
+  for(let i=0;i<9;i++){const x=60+i*190+R()*60;if(x>380&&x<560)continue;mid+=R()<.25?pine(x,420+R()*18,.85):oak(x,424+R()*14,.95)}
+  const fence=Array.from({length:34},(_,i)=>`<rect x="${i*50}" y="498" width="8" height="40" rx="2" fill="#8a5a2a"/>`).join('')+`<rect x="0" y="506" width="1600" height="6" fill="#a8743a"/><rect x="0" y="522" width="1600" height="6" fill="#a8743a"/>`;
+  front=pumpkin(170,566,1.3)+pumpkin(215,572,.9)+hay(330,566,1.1)+pumpkin(760,570,1.1)+hay(1060,568,1.2)+pumpkin(1120,574,.85)+pumpkin(1420,566,1.4)+pumpkin(1470,574,.9)+oak(40,560,1.5)+oak(1570,562,1.6);
+  const birds=[[300,140],[330,128],[352,146],[1000,110],[1025,98]].map(([x,y])=>`<path d="M${x} ${y}q8-8 16 0q8-8 16 0" stroke="#2a1020" stroke-width="3" fill="none" stroke-linecap="round"/>`).join('');
+  const svg=`<svg viewBox="0 0 1600 600" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs><radialGradient id="sunG"><stop offset="0" stop-color="#fff0b0"/><stop offset=".45" stop-color="#ffc861"/><stop offset="1" stop-color="#ff9a3a" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="1230" cy="250" r="200" fill="url(#sunG)" opacity=".7"/><circle cx="1230" cy="250" r="78" fill="#ffd56b"/>
+    ${cloud(200,120,1,0)}${cloud(700,80,.8,-40)}${cloud(1300,140,1.1,-70)}${birds}
+    <path d="M0 300Q200 230 420 280T840 270T1260 260T1600 280V600H0z" fill="#8a3a2a"/>
+    ${back}
+    <path d="M0 410Q240 340 520 390T1040 380T1600 400V600H0z" fill="#6b3a16"/>
+    <g transform="translate(470 404)"><rect x="-70" y="-70" width="140" height="70" fill="#b8282a" stroke="#5a0f10" stroke-width="3"/><path d="M-82-68L0-128L82-68z" fill="#8a1c1e" stroke="#5a0f10" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="-24" y="-46" width="48" height="46" fill="#f3e2c0"/><path d="M-24-46L24 0M24-46L-24 0" stroke="#b8282a" stroke-width="4"/><rect x="-12" y="-100" width="24" height="20" fill="#f3e2c0"/><path d="M-70-70h140" stroke="#f3e2c0" stroke-width="4"/></g>
+    ${mid}
+    <path d="M0 500Q300 450 640 490T1280 480T1600 500V600H0z" fill="#4a2a0e"/>
+    ${fence}
+    <path d="M0 540Q400 510 800 540T1600 540V600H0z" fill="#3a2008"/>
+    ${front}</svg>`;
+  const scene=()=>{const d=document.createElement('div');d.className='scene';d.setAttribute('aria-hidden','true');d.innerHTML=svg;return d};
+  document.body.prepend(make());document.body.prepend(scene());const h=document.getElementById('home');if(h){h.prepend(make());h.prepend(scene())}})();
+
 // ---------- sound: made with the Web Audio API (no sound files) ----------
 const Sound=(()=>{
   let ctx=null,music=null,sfx=null,musicOn=true,sfxOn=true;
@@ -1681,6 +1738,21 @@ const Sound=(()=>{
       I:['0:m7','5:7','0:m7','5:7'],A:['0:m7','0:m6','10:7','3:maj7','8:maj7','2:m7b5','7:7','7:7'],B:['5:m7','10:7','3:maj7','8:maj7','2:m7b5','7:7','0:m7','7:7'],O:['2:m7b5','7:7','0:m7','0:m7']},
     {title:'Lucky Seven Shuffle',groove:'swing',bpm:126,key:60,scale:MAJ,lead:'vibes',
       I:['0:6','9:m7','2:m7','7:7'],A:['0:6','0:7','5:6','5:dim','0:6','9:7','2:m7','7:7'],B:['4:m7','9:7','2:m7','7:7','4:m7','9:7','2:m7','7:7'],O:['2:m7','7:7','0:6','0:6']}];
+  // Thanksgiving playlist: warm, cozy autumn tunes (the songs above stay for the rest of the year)
+  const TG_SONGS=[
+    {title:'Harvest Moon Stroll',groove:'ballad',bpm:78,key:62,scale:MAJ,lead:'flute',
+      I:['0:6','5:maj7','0:6','7:sus'],A:['0:6','4:m7','5:maj7','7:7','0:6','9:m7','2:m7','7:7'],B:['5:maj7','7:7','4:m7','9:m7','2:m7','5:m6','0:6','7:sus'],O:['5:maj7','7:7','0:6','0:6']},
+    {title:'Pumpkin Pie Shuffle',groove:'swing',bpm:132,key:65,scale:MAJ,lead:'vibes',
+      I:['0:6','9:7','2:m7','7:7'],A:['0:6','0:7','5:6','5:m6','0:6','9:7','2:m7','7:7'],B:['5:6','5:m6','0:6','9:7','2:7','2:7','7:7','7:7'],O:['2:m7','7:7','0:6','0:6']},
+    {title:'Cranberry Bossa',groove:'bossa',bpm:112,key:60,scale:MAJ,lead:'marimba',
+      I:['0:maj7','9:m7','2:m7','7:7'],A:['0:maj7','9:m7','2:m7','7:7','4:m7','9:7','2:m7','7:7'],B:['5:maj7','5:m6','4:m7','9:7','2:m9','7:7','0:maj7','7:sus'],O:['2:m7','7:7','0:maj7','0:maj7']},
+    {title:'Falling Leaves',groove:'ballad',bpm:70,key:57,scale:MIN,lead:'vibes',
+      I:['0:m7','5:m7','10:7','3:maj7'],A:['0:m7','5:m7','10:7','3:maj7','8:maj7','2:m7b5','7:7','0:m6'],B:['5:m7','10:7','3:maj7','8:maj7','2:m7b5','7:7','0:m7','7:7'],O:['2:m7b5','7:7','0:m6','0:m6']},
+    {title:'Gobble Gobble Groove',groove:'funk',bpm:104,key:64,scale:MAJ,lead:'synth',
+      I:['0:9','0:9','5:9','5:9'],A:['0:9','0:9','5:9','5:9','0:9','0:9','7:sus','7:7'],B:['5:9','5:9','0:9','9:m7','2:m7','7:7','0:9','7:7'],O:['5:9','7:7','0:9','0:9']},
+    {title:'Thankful Table',groove:'samba',bpm:100,key:67,scale:MAJ,lead:'flute',
+      I:['0:6','5:maj7','7:7','0:6'],A:['0:6','4:m7','5:maj7','7:7','0:6','9:m7','2:m7','7:7'],B:['5:maj7','7:7','0:6','9:m7','2:m7','7:7','0:6','0:6'],O:['2:m7','7:7','0:6','0:6']}];
+  const PLAYLIST=SEASON==='thanksgiving'?TG_SONGS:SONGS;
   const FORM=['I','A','A','B','A','B','A','O'];
   function rng(seed){let h=seed>>>0||1;return()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return(h>>>0)/4294967296}}
   const chordOf=(song,c)=>{const [r,q]=c.split(':');const root=song.key+(+r);return{root,tones:QUAL[q].map(i=>root+i)}};
@@ -1704,9 +1776,9 @@ const Sound=(()=>{
         prev=m;(bars[b]=bars[b]||[]).push([o,m])})});
     return bars.map((notes,b)=>(notes||[]).map(([o,m],i)=>[o,m,Math.max(1,((notes[i+1]?notes[i+1][0]:8)-o))]))}
   let cur=null,songIdx=-1,order=[],barPos=0,eighth=0,next=0,timer=null,gapUntil=0,tl=[];
-  function pickSong(skip){if(!order.length){order=SONGS.map((_,i)=>i);for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
+  function pickSong(skip){if(!order.length){order=PLAYLIST.map((_,i)=>i);for(let i=order.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]]}
       if(order[0]===songIdx)order.push(order.shift())}
-    songIdx=order.shift();cur=SONGS[songIdx];const R=rng(songIdx*7919+13),mel={};
+    songIdx=order.shift();cur=PLAYLIST[songIdx];const R=rng(songIdx*7919+13),mel={};
     ['A','B'].forEach(k=>mel[k]=compose(cur,cur[k],R,k==='B'));
     tl=[];FORM.forEach((sec,si)=>cur[sec].forEach((c,b)=>{const later=FORM.slice(0,si).filter(x=>x===sec).length;tl.push({c,sec,b,mel:mel[sec]?mel[sec][b]:null,orn:later>=2})}));
     barPos=0;eighth=0;if(typeof toast==='function'&&!skip)toast(`♪ Now playing: ${cur.title}`);if(typeof onSong==='function')onSong(cur.title)}
