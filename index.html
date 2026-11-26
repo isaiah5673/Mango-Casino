@@ -2173,9 +2173,9 @@ const Pool=(()=>{
   const skill=()=>[0.9,1][level()];
   const skillName=()=>['Hard','Extreme'][level()];
   // pockets play a little tighter on your shots and a little kinder on the AI's
-  const pocketR=()=>simming||turn==='ai'?PR+4:PR-(level()?6:5);
+  const pocketR=()=>simming?PR+1:turn==='ai'?PR+(level()?1:0):PR-(level()?4:2);
   const next=()=>document.hidden?setTimeout(tick,16):requestAnimationFrame(tick);
-  function shoot(power){if(moving)return;locked=false;const c=cue();if(c.in)respotCue();potted=[];if(!isFinite(aim))aim=0;if(turn==='you')aim+=(rand()-0.5)*(level()?0.04:0.026);c.vx=Math.cos(aim)*power*0.27;c.vy=Math.sin(aim)*power*0.27;moving=true;shotT0=performance.now();Sound.cue();controls();next()}
+  function shoot(power){if(moving)return;locked=false;const c=cue();if(c.in)respotCue();potted=[];if(!isFinite(aim))aim=0;if(turn==='you')aim+=(rand()-0.5)*(level()?0.03:0.016);c.vx=Math.cos(aim)*power*0.27;c.vy=Math.sin(aim)*power*0.27;moving=true;shotT0=performance.now();Sound.cue();controls();next()}
   const scheduleAI=ms=>{clearTimeout(aiTimer);aiAt=performance.now();aiTimer=setTimeout(aiTurn,ms)};
   let lastClack=0,simming=false;const clack=v=>{if(simming)return;const t=performance.now();if(t-lastClack>35){Sound.clack(v);lastClack=t}};
   function physics(){const live=balls.filter(b=>!b.in);
@@ -2241,7 +2241,9 @@ const Pool=(()=>{
       const ok=!r.cueIn&&r.got.some(mine)&&!(r.got.includes(8)&&!(groups.ai&&left('ai')===0)),bad=r.cueIn||r.got.includes(8)&&!(groups.ai&&left('ai')===0);
       const v=(ok?100:0)-(bad?200:0)+r.next*8-cd.score*4;if(v>bestV){bestV=v;best={a:cd.a,pw}}}
     let power;
-    if(best){aim=best.a+(rand()-0.5)*(level()?0.002:0.008);power=best.pw}
+    // the AI still misses now and then: about 1 in 2-3 shots (a bit more often on Hard)
+    const miss=rand()<(level()?0.2:0.28);
+    if(best){aim=best.a+(miss?(rand()<.5?-1:1)*(0.035+rand()*0.045):(rand()-0.5)*(level()?0.006:0.012));power=best.pw}
     else{const t=targets.slice().sort((p,q)=>Math.hypot(p.x-c.x,p.y-c.y)-Math.hypot(q.x-c.x,q.y-c.y))[0];aim=t?Math.atan2(t.y-c.y,t.x-c.x):rand()*6.28;power=60}
     if(!isFinite(aim))aim=rand()*6.28;if(!isFinite(power))power=60;
     say('pMsg','The AI is lining up a shot…','');draw();
