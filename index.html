@@ -2121,10 +2121,10 @@ const Pool=(()=>{
     stake=bets.pool;rack();groups={you:null,ai:null};playing=true;turn='you';hint=true;aim=0;
     say('pMsg',`Your break! AI level: ${skillName()}. Aim at the rack and shoot hard`);Sound.cash();controls();draw()}
   let shotT0=0,aiTimer=0,aiAt=0;
-  // the AI gets better the more you bet: under $2M easy, $2M normal, $6M hard, $10M+ pretty dang hard
-  const level=()=>stake>=10e6?3:stake>=6e6?2:stake>=2e6?1:0;
+  // the AI gets better the more you bet: under $1M easy, $1M normal, $6M hard, $10M+ extreme
+  const level=()=>stake>=10e6?3:stake>=6e6?2:stake>=1e6?1:0;
   const skill=()=>[0.35,0.7,0.88,1][level()];
-  const skillName=()=>['Easy','Normal','Hard','Pretty Dang Hard'][level()];
+  const skillName=()=>['Easy','Normal','Hard','Extreme'][level()];
   const next=()=>document.hidden?setTimeout(tick,16):requestAnimationFrame(tick);
   function shoot(power){if(moving)return;locked=false;const c=cue();if(c.in)respotCue();potted=[];if(!isFinite(aim))aim=0;c.vx=Math.cos(aim)*power*0.27;c.vy=Math.sin(aim)*power*0.27;moving=true;shotT0=performance.now();Sound.cue();controls();next()}
   const scheduleAI=ms=>{clearTimeout(aiTimer);aiAt=performance.now();aiTimer=setTimeout(aiTurn,ms)};
