@@ -907,7 +907,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
     </div>
     <div class="rail"><div class="row" id="pkBet"></div>
       <div class="row"><button class="btn" id="pkDeal">Deal</button><button class="btn green" id="pkCall" hidden>Call</button><button class="btn red" id="pkFold" hidden>Fold</button></div>
-      <div class="small">You and the dealer each get 2 cards, then the flop. Call (2× your ante) or fold. Best 5-card hand wins. The dealer needs a pair of 4s or better to qualify; if not, your ante pays and your call comes back.</div></div>
+      <div class="small">You and the dealer each get 2 cards, then the flop. Call (1.5× your ante) or fold. Best 5-card hand wins. The dealer needs a pair of 4s or better to qualify; if not, your ante pays and your call comes back.</div></div>
   </section>
 
   <!-- VIDEO POKER -->
@@ -2236,6 +2236,7 @@ const Poker=(()=>{
   const one=r=>({14:'Ace',13:'King',12:'Queen',11:'Jack'})[r]||String(r);
   const describe=h=>[`${one(h.tb[0])} high`,`Pair of ${pairName(h.tb[0])}`,`Two pair, ${pairName(h.tb[0])} and ${pairName(h.tb[1])}`,`Three ${pairName(h.tb[0])}`,
     `Straight, ${one(h.tb[0])} high`,`Flush, ${one(h.tb[0])} high`,`Full house, ${pairName(h.tb[0])} over ${pairName(h.tb[1])}`,`Four ${pairName(h.tb[0])}`,h.royal?'Royal flush':`Straight flush, ${one(h.tb[0])} high`][h.cat];
+  const CALLX=1.5,callOf=a=>Math.round(a*CALLX);
   const qualifies=h=>h.cat>=2||(h.cat===1&&h.tb[0]>=4);
   const anteMult=h=>h.royal?100:h.cat===8?20:h.cat===7?10:h.cat===6?3:h.cat===5?2:1;
   let shownNow=[],seen=new Set(); // cards already on the table don't replay the deal animation
@@ -2252,23 +2253,25 @@ const Poker=(()=>{
     $('pkPay').innerHTML=ANTE.map(([n,m],i)=>`<span class="${i===hi?'hit':''}">${n}<b>${m} to 1</b></span>`).join('');
     $('pkDeal').hidden=phase==='decide';$('pkCall').hidden=$('pkFold').hidden=phase!=='decide';
     $('pkCall').disabled=$('pkFold').disabled=busy;$('pkDeal').disabled=busy;
-    $('pkCall').textContent=`Call ${fmt(ante*2)}`;
+    $('pkCall').textContent=`Call ${fmt(callOf(ante))}`;
     $('pkBet').querySelectorAll('button,input').forEach(b=>b.disabled=phase==='decide'||busy)}
   function deal(){if(busy||phase==='decide')return;
-    const a=bets.poker;if(money>=1&&a*3>money+1e-9){say('pkMsg',`You need ${fmt(a*3)} to play: the ante plus a call of 2×`,'lose');return}
+    const a=bets.poker;if(money>=1&&a+callOf(a)>money+1e-9){say('pkMsg',`You need ${fmt(a+callOf(a))} to play: the ante plus a call of 1.5×`,'lose');return}
     if(!take(a)){say('pkMsg','Not enough money for that ante','lose');return}
     ante=a;newDeck();seen=new Set();P=[deck.pop(),deck.pop()];D=[deck.pop(),deck.pop()];B=[deck.pop(),deck.pop(),deck.pop(),deck.pop(),deck.pop()];
+    // house edge: now and then the dealer gets a second look and keeps the better two cards
+    if(rand()<0.08){const alt=[deck.pop(),deck.pop()];if(best([...alt,...B]).sc>best([...D,...B]).sc){deck.push(...D);D=alt}else deck.push(...alt)}
     phase='decide';Sound.card();render({board:3});
     const h=best([...P,...B.slice(0,3)]);$('pkP').textContent=describe(h);$('pkD').textContent='?';
-    say('pkMsg',`You have ${describe(h)}. Call for ${fmt(ante*2)} or fold?`)}
+    say('pkMsg',`You have ${describe(h)}. Call for ${fmt(callOf(ante))} or fold?`)}
   function fold(){if(phase!=='decide'||busy)return;phase='bet';Sound.lose();
     const hp=best([...P,...B]),hd=best([...D,...B]);render({board:5,dealer:true});$('pkP').textContent=describe(hp);$('pkD').textContent=describe(hd);
     say('pkMsg',`You folded. −${fmt(ante)}`,'lose')}
-  function call(){if(phase!=='decide'||busy)return;if(!take(ante*2)){say('pkMsg','Not enough money to call','lose');return}
+  function call(){if(phase!=='decide'||busy)return;if(!take(callOf(ante))){say('pkMsg','Not enough money to call','lose');return}
     busy=true;Sound.cash();render({board:3});
     const steps=[()=>render({board:4}),()=>render({board:5}),()=>render({board:5,dealer:true})];
     steps.forEach((f,i)=>setTimeout(()=>{f();Sound.card()},(i+1)*550));
-    setTimeout(()=>{busy=false;phase='bet';const hp=best([...P,...B]),hd=best([...D,...B]),call=ante*2;
+    setTimeout(()=>{busy=false;phase='bet';const hp=best([...P,...B]),hd=best([...D,...B]),call=callOf(ante);
       $('pkP').textContent=describe(hp);$('pkD').textContent=describe(hd);
       const mult=anteMult(hp),hi=hp.royal?0:hp.cat===8?1:hp.cat===7?2:hp.cat===6?3:hp.cat===5?4:5;
       let back=0,msg,kind;
