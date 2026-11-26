@@ -447,6 +447,25 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .tipwho{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}.tipwho .chname{font-size:20px;cursor:default}
 .tipin{width:100%;box-sizing:border-box;text-align:center;font-size:18px}
 .tipq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.tipq .btn{padding:0 4px;font-size:14px;min-height:38px}
+.plgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:6px}
+.plcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px 12px;border-radius:16px;background:rgba(0,0,0,.32);border:2px solid rgba(255,255,255,.08);cursor:pointer;color:inherit;font:inherit;text-align:center;transition:transform .12s,border-color .12s}
+.plcard:hover,.plcard:focus-visible{transform:translateY(-2px);border-color:var(--gold)}
+.plcard.me{border-color:rgba(182,255,59,.6)}
+.plcard .av{width:64px;height:auto}
+.plcard b{font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plcard .pm{font-weight:800;color:var(--gold);font-size:14px}.plcard small{opacity:.75;font-size:12px}
+.plcard .plrk{position:absolute;top:8px;left:10px;font:900 13px Inter,sans-serif;opacity:.8}
+.plcard .pldot{position:absolute;top:10px;right:10px}
+.pldot{display:inline-block;width:12px;height:12px;border-radius:50%;background:#7d8590;box-shadow:0 0 0 2px rgba(0,0,0,.45);vertical-align:-1px}
+.pldot.on{background:#3ddc6a;box-shadow:0 0 0 2px rgba(0,0,0,.45),0 0 8px #3ddc6a}
+.plcard .ttl{font-size:10px;padding:2px 8px}
+.plmsg{grid-column:1/-1;text-align:center;padding:30px 10px;opacity:.85}
+.dialog>div.plbox{max-width:380px;text-align:center}
+.plbig{display:flex;justify-content:center}.plbig .av{width:110px;height:auto}
+.plstatus{font-weight:700;margin-bottom:10px}
+.plstats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px;text-align:left}
+.plstats div{background:rgba(0,0,0,.3);border-radius:10px;padding:7px 10px}.plstats dt{font-size:11px;opacity:.7;text-transform:uppercase;letter-spacing:.05em}.plstats dd{margin:0;font-weight:800}
+.plstats div.wide{grid-column:1/-1;display:flex;align-items:center;gap:10px}.plstats .card{width:30px;height:42px;margin:0;flex:none}
 .lbttl{display:block;margin:3px 0 2px}.lbttl .ttl{font-size:11px;padding:3px 9px}
 .dotable{position:relative}
 .dotable.hasdot::after{content:"";position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 0 2px #0b2a1e,0 0 10px rgba(255,59,59,.8);animation:dotpulse 1.4s ease-in-out infinite}
@@ -483,6 +502,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
       <button class="btn alt" id="profBtn">Profile</button>
       <button class="btn alt dotable" id="homeShop">Shop</button>
       <button class="btn alt" id="homeLb">🏆 Leaderboard</button>
+      <button class="btn alt" id="homePl">👥 Players</button>
       <div class="toggles">
         <button class="btn alt" id="musicBtn">Music: On</button>
         <button class="btn alt" id="sfxBtn">Sounds: On</button>
@@ -566,6 +586,15 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
   <div class="row"><button class="btn" id="noticeOk">OK</button></div>
 </div></div>
 
+<div class="dialog" id="plDlg" hidden role="dialog" aria-modal="true" aria-labelledby="plName"><div class="tipbox plbox">
+  <div class="plbig" id="plAv"></div>
+  <h3 id="plName" class="sign" style="font-size:28px;margin:4px 0 2px"></h3>
+  <div id="plTag" style="margin-bottom:6px"></div>
+  <div class="plstatus" id="plStatus"></div>
+  <dl class="plstats" id="plStats"></dl>
+  <div class="row"><button class="btn alt" id="plClose">Close</button><button class="btn" id="plTip">💸 Tip</button></div>
+</div></div>
+
 <div class="dialog" id="tipDlg" hidden role="dialog" aria-modal="true" aria-labelledby="tipTitle"><div class="tipbox">
   <h3 id="tipTitle" class="sign" style="font-size:28px;margin:0 0 8px">Tip a player</h3>
   <div class="tipwho" id="tipWho"></div>
@@ -617,7 +646,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
   <!-- LOBBY -->
   <section id="v-lobby">
     <h2>Choose a game</h2>
-    <div class="lobbar"><button class="chipbtn dotable" id="lShop" data-go="shop">🛍️ <b>Shop</b></button><button class="chipbtn" data-go="wardrobe">👕 <b>Wardrobe</b></button><button class="chipbtn" data-go="leaderboard">🏆 <b>Leaderboard</b></button><span class="chipbtn boost" id="lBoost" hidden></span></div>
+    <div class="lobbar"><button class="chipbtn dotable" id="lShop" data-go="shop">🛍️ <b>Shop</b></button><button class="chipbtn" data-go="wardrobe">👕 <b>Wardrobe</b></button><button class="chipbtn" data-go="leaderboard">🏆 <b>Leaderboard</b></button><button class="chipbtn" data-go="players">👥 <b>Players</b></button><span class="chipbtn boost" id="lBoost" hidden></span></div>
     <div class="lobby">
       <button class="tile" data-go="fps"><svg viewBox="0 0 300 150" aria-hidden="true"><defs><linearGradient id="fsk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8794a"/><stop offset="1" stop-color="#f6b27a"/></linearGradient><linearGradient id="ffl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a5466"/><stop offset="1" stop-color="#3a4150"/></linearGradient></defs>
 <rect width="300" height="150" fill="url(#fsk)"/><rect y="78" width="300" height="72" fill="url(#ffl)"/>
@@ -797,6 +826,15 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
   </section>
 
   <!-- LEADERBOARD -->
+  <section id="v-players" hidden>
+    <h2>Players</h2>
+    <div class="felt" style="background:radial-gradient(90% 70% at 50% 25%,#16324a 0%,#0a1622 100%)">
+      <div class="lbhead"><span id="plHead">Everyone in Lucky Mango Casino, richest first</span><button class="btn alt" id="plRefresh">↻ Refresh</button></div>
+      <div class="plgrid" id="plGrid" aria-live="polite"></div>
+      <p class="small" style="margin:10px 0 0"><span class="pldot on"></span> online &nbsp; <span class="pldot"></span> offline · Tap a player to see their stats.</p>
+    </div>
+  </section>
+
   <section id="v-leaderboard" hidden>
     <h2>Leaderboard</h2>
     <div class="felt" style="background:radial-gradient(90% 70% at 50% 25%,#3a2f0f 0%,#1a1406 100%)">
@@ -1143,9 +1181,12 @@ const Auth=(()=>{
       else if(bonus!==0){let mm=0;try{mm=+JSON.parse(LS.getItem(nsKey(u,'casino-money'))||'0')||0}catch(e){}LS.setItem(nsKey(u,'casino-money'),JSON.stringify(Math.max(0,mm+bonus)))}}catch(e){}
     const upd=+LS.getItem(nsKey(u,'_updated'))||Date.now();
     const sv=localSave(u);let m=0,pn=a.name,fr=null;try{m=Math.floor(+JSON.parse(sv['casino-money']||'0'))||0}catch(e){}try{const pr=JSON.parse(sv['casino-profile']||'{}');if(pr&&pr.name)pn=String(pr.name).slice(0,24);var dv=!!(pr&&pr.dev)}catch(e){}let ti=null;try{const sd=JSON.parse(sv['casino-shop']||'{}');fr=sd.eq||null;ti=sd.eqTitle||null}catch(e){}
-    try{await accDoc(db,u).set({name:a.name,salt:a.salt,alg:a.alg||'p',hash:a.hash,created:a.created||Date.now(),updated:upd,save:sv,money:m,pname:pn,frame:fr,title:ti,dev:typeof dv!=='undefined'&&dv,bonus:0,bonusFrom:''});cloudOK=true;cloudMsg='';return true}
+    try{await accDoc(db,u).set({name:a.name,salt:a.salt,alg:a.alg||'p',hash:a.hash,created:a.created||Date.now(),updated:upd,save:sv,money:m,pname:pn,frame:fr,title:ti,dev:typeof dv!=='undefined'&&dv,bonus:0,bonusFrom:'',seen:document.visibilityState==='hidden'?0:Date.now()});cloudOK=true;cloudMsg='';return true}
     catch(e){cloudOK=false;cloudMsg=e&&e.code==='invalid_argument'?'readonly':'down';return false}finally{paint()}}
   let pushT=0,pushing=false,again=false;
+  // heartbeat so other players can see you're online (green dot)
+  setInterval(()=>{if(sessionUser&&document.visibilityState!=='hidden')pushLoop()},60000);
+  document.addEventListener('visibilitychange',()=>{if(sessionUser)pushLoop()});
   async function pushLoop(){if(pushing){again=true;return}pushing=true;try{do{again=false;if(sessionUser)await pushNow(sessionUser)}while(again)}finally{pushing=false}}
   onStoreWrite=()=>{if(!sessionUser)return;LS.setItem(nsKey(sessionUser,'_updated'),String(Date.now()));clearTimeout(pushT);pushT=setTimeout(pushLoop,2500)};
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&sessionUser){clearTimeout(pushT);pushLoop()}});
@@ -1221,6 +1262,11 @@ const Auth=(()=>{
   if(!sessionUser&&!guestOk)open();
   async function top(){const db=await getDB();if(!db)return null;const q=await db.collection('mango_accounts').orderBy('money','desc').limit(40).get();
     return q.docs.filter(d=>{const x=d.data()||{};return x.banned!==true&&x.notice!==true&&!String(d.id).startsWith('-')}).slice(0,25).map(d=>{const x=d.data()||{};return{id:d.id,name:String(x.pname||x.name||d.id),money:+x.money||0,frame:typeof x.frame==='string'?x.frame:null,title:typeof x.title==='string'?x.title:null,dev:x.dev===true}}).filter(r=>r.money>=0)}
+  async function players(){const db=await getDB();if(!db)return null;const q=await db.collection('mango_accounts').orderBy('money','desc').limit(200).get();
+    const J=v=>{try{return JSON.parse(v||'null')}catch(e){return null}};
+    return q.docs.filter(d=>{const x=d.data()||{};return x.banned!==true&&x.notice!==true&&!String(d.id).startsWith('-')}).map(d=>{const x=d.data()||{},sv=x.save||{},pr=J(sv['casino-profile'])||{},sh=J(sv['casino-shop'])||{};
+      return{id:d.id,name:String(x.pname||x.name||d.id).slice(0,24),money:Math.max(0,+x.money||0),frame:typeof x.frame==='string'?x.frame:null,title:typeof x.title==='string'?x.title:null,dev:x.dev===true,
+        seen:+x.seen||0,created:+x.created||0,bets:Math.max(0,+pr.bets||0),highest:Math.max(+pr.highest||0,+x.money||0),owned:Array.isArray(sh.owned)?sh.owned.length:0,back:typeof sh.eqBack==='string'?sh.eqBack:null}})}
   async function give(name,amt,from){const db=await getDB();if(!db)throw new Error('Online accounts aren\'t reachable here');const u=String(name).trim().toLowerCase();
     if(!/^[a-z0-9_]{3,16}$/.test(u))throw new Error('That isn\'t a valid username');const sn=await accDoc(db,u).get();if(!sn.exists)throw new Error(`No player called "${name}"`);
     const d={...sn.data()};d.bonus=Math.floor(+d.bonus||0)+amt;d.money=Math.max(0,Math.floor(+d.money||0)+amt);d.bonusFrom=from;
@@ -1239,7 +1285,7 @@ const Auth=(()=>{
   // check now and then for money other players sent you, so it arrives while you're online
   setInterval(async()=>{if(!sessionUser||document.visibilityState==='hidden')return;const db=await getDB();if(!db)return;
     try{const s=await accDoc(db,sessionUser).get();const x=s.exists?(s.data()||{}):{};if(x.banned===true)kick();else if(Math.floor(+x.bonus||0)!==0)pushLoop()}catch(e){}},25000);
-  return{open,top,adminGive,setBan,tip,getDB,myName,sha:sha256,save:()=>pushLoop(),get user(){return sessionUser}};
+  return{open,top,players,adminGive,setBan,tip,getDB,myName,sha:sha256,save:()=>pushLoop(),get user(){return sessionUser}};
 })();
 
 let limboPreview=null;
@@ -1866,13 +1912,14 @@ function refreshBets(){document.querySelectorAll('[data-key]').forEach(el=>{cons
   if(limboPreview)limboPreview()}
 
 // ---------- screens ----------
-const VIEWS=['profile','lobby','leaderboard','chat','fps','shop','wardrobe','war','reddog','tcp','dt','ab','c4','board','horse','bingo','poker','bj','roulette','pool','slots','plinko','mines','hilo','limbo','vpoker','baccarat','craps','keno','crash','dice','coin','wheel','scratch'];
-function go(v){VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);window.scrollTo(0,0);if(v==='pool')Pool.draw();if(v==='roulette')Roulette.drawWheel();if(v==='plinko')Plinko.draw();if(v==='crash')Crash.draw();if(v==='wheel')WheelF.draw();if(v==='shop'){renderShop();tickClock()}if(v==='wardrobe')renderGoods(tierOf(money));if(v==='leaderboard')Board.load();if(v==='chat')Chat.open();if(v==='fps')Shooter.render()}
+const VIEWS=['profile','lobby','leaderboard','players','chat','fps','shop','wardrobe','war','reddog','tcp','dt','ab','c4','board','horse','bingo','poker','bj','roulette','pool','slots','plinko','mines','hilo','limbo','vpoker','baccarat','craps','keno','crash','dice','coin','wheel','scratch'];
+function go(v){VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);window.scrollTo(0,0);if(v==='pool')Pool.draw();if(v==='roulette')Roulette.drawWheel();if(v==='plinko')Plinko.draw();if(v==='crash')Crash.draw();if(v==='wheel')WheelF.draw();if(v==='shop'){renderShop();tickClock()}if(v==='wardrobe')renderGoods(tierOf(money));if(v==='leaderboard')Board.load();if(v==='players')Players.load();if(v==='chat')Chat.open();if(v==='fps')Shooter.render()}
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{Sound.click();go(b.dataset.go)}));
 $('toLobby').addEventListener('click',()=>{Sound.click();go('lobby')});$('lobbyBtn').addEventListener('click',()=>{Sound.click();go('lobby')});
 $('homeBtn').addEventListener('click',()=>{Sound.click();$('home').hidden=false});
 $('enter').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('lobby')});
 $('homeLb').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('leaderboard')});
+$('homePl').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('players')});
 $('homeChat').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('chat')});
 $('homeShop').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('shop')});
 $('profBtn').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('profile')});
@@ -3222,6 +3269,38 @@ const Shooter=(()=>{
   return{render:()=>{ensure();resume()}};
 })();
 
+const Players=(()=>{let busy=false,rows=[],sel=null;const esc=t=>{const s=document.createElement('span');s.textContent=t;return s.innerHTML};
+  const ONLINE=150000,isOn=r=>r.id===Auth.user||(r.seen&&Date.now()-r.seen<ONLINE);
+  const ago=t=>{if(!t)return 'a while ago';const s=Math.max(0,(Date.now()-t)/1000);return s<90?'just now':s<3600?Math.round(s/60)+' min ago':s<86400?Math.round(s/3600)+' h ago':Math.round(s/86400)+' days ago'};
+  const day=t=>t?new Date(t).toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'}):'—';
+  const fr=r=>r.frame&&FRAMES.some(f=>f.id===r.frame)?r.frame:null;
+  const tag=r=>r.dev?DEVTAG:r.title&&TITLES.some(x=>x.id===r.title)?titleHTML(r.title):'';
+  const nameStyle=r=>r.dev?'class="chname rb"':`style="color:${TIERS[tierOf(r.money)].c[0]}"`;
+  function card(r,i){const t=tierOf(r.money),on=isOn(r);
+    return `<button class="plcard${r.id===Auth.user?' me':''}" data-i="${i}" aria-label="${esc(r.name)}, ${TIERS[t].name}, ${on?'online':'offline'}"><span class="plrk">#${i+1}</span><span class="pldot${on?' on':''}"></span>
+      ${avatar(t,fr(r))}<b ${nameStyle(r)}>${esc(r.name)}</b>${tag(r)}<span class="pm">${fmt(r.money)}</span><small>${TIERS[t].name}</small></button>`}
+  async function load(){if(busy)return;busy=true;const G=$('plGrid');if(!rows.length)G.innerHTML='<div class="plmsg">Loading players…</div>';
+    let got;try{got=await Auth.players()}catch(e){got=undefined}busy=false;
+    if(got===null){G.innerHTML='<div class="plmsg">Players need online accounts, which aren\'t set up here.</div>';return}
+    if(got===undefined){G.innerHTML='<div class="plmsg">Couldn\'t load players right now. Try ↻ Refresh.</div>';return}
+    rows=got;if(!rows.length){G.innerHTML='<div class="plmsg">No players yet.</div>';return}
+    const onN=rows.filter(isOn).length;$('plHead').textContent=`${rows.length} players · ${onN} online now`;
+    G.innerHTML=rows.map(card).join('');G.querySelectorAll('.plcard').forEach(b=>b.addEventListener('click',()=>show(+b.dataset.i)))}
+  function show(i){const r=rows[i];if(!r)return;sel=r;const t=tierOf(r.money),on=isOn(r),bk=r.back&&BACKS.some(x=>x.id===r.back)?itemById(r.back):null;
+    $('plAv').innerHTML=avatar(t,fr(r));$('plName').innerHTML=`<span ${nameStyle(r)}>${esc(r.name)}</span>`;$('plTag').innerHTML=tag(r);
+    $('plStatus').innerHTML=on?'<span class="pldot on"></span> Online now':`<span class="pldot"></span> Offline · last seen ${ago(r.seen)}`;
+    const nextT=TIERS[t+1];
+    const st=[['Rank',`#${i+1} of ${rows.length}`],['Money',fmt(r.money)],['Tier',TIERS[t].name],['Next tier',nextT?`${nextT.name} (${fmt(nextT.min)})`:'Top tier!'],
+      ['Highest money',fmt(r.highest)],['Bets placed',(r.bets||0).toLocaleString('de-DE')],['Goodies owned',String(r.owned)],['Joined',day(r.created)]];
+    $('plStats').innerHTML=st.map(([k,v])=>`<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')+(bk?`<div class="wide"><div class="card back ${bk.id} ${bk.id}"></div><span><dt>Card back</dt><dd>${bk.name}</dd></span></div>`:'');
+    const self=r.id===Auth.user;$('plTip').hidden=self;
+    $('plDlg').hidden=false;Sound.click();$('plClose').focus()}
+  $('plClose').addEventListener('click',()=>{$('plDlg').hidden=true;Sound.click()});
+  $('plDlg').addEventListener('click',e=>{if(e.target===$('plDlg'))$('plDlg').hidden=true});
+  $('plTip').addEventListener('click',()=>{if(!sel)return;$('plDlg').hidden=true;Chat.openTip({user:sel.id,name:sel.name,tier:tierOf(sel.money),dev:sel.dev})});
+  $('plRefresh').addEventListener('click',()=>{Sound.click();load()});
+  setInterval(()=>{if(!$('v-players').hidden&&document.visibilityState!=='hidden')load()},30000);
+  return{load}})();
 const Board=(()=>{let busy=false;const esc=t=>{const s=document.createElement('span');s.textContent=t;return s.innerHTML};
   async function load(){if(busy)return;busy=true;const L=$('lbList');L.innerHTML='<li class="lbmsg">Loading the leaderboard…</li>';$('lbNote').textContent='';
     let rows=null,timedOut=false;const tm=setTimeout(()=>{timedOut=true;L.innerHTML='<li class="lbmsg">The leaderboard is taking a while to load…</li>'},10000);
