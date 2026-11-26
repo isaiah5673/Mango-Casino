@@ -1765,7 +1765,7 @@ $('nameSave').addEventListener('click',()=>{const v=$('nameIn').value.trim().sli
 $('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('nameSave').click()});
 const Dev=(()=>{let open=false;try{open=sessionStorage.getItem('mc-dev')==='1'}catch(e){}
   // developer tools belong to the owner's account only
-  const OWNER='mangomaucho',CODE='14d40b61f4cd13e34b0b8be0e55c4e207910ae167c6285f79a2145831423f0cb';
+  const OWNER='isaiah',CODE='14d40b61f4cd13e34b0b8be0e55c4e207910ae167c6285f79a2145831423f0cb';
   const isOwner=()=>Auth.user===OWNER;
   function guard(){const ok=isOwner();$('devKey').hidden=!ok;if(!ok){if(open){open=false;try{sessionStorage.removeItem('mc-dev')}catch(e){}}$('devDlg').hidden=true}}
   setInterval(guard,1000);guard();
