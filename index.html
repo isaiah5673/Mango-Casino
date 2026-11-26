@@ -256,6 +256,11 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .giftbox .lid{transition:transform .5s cubic-bezier(.3,1.6,.5,1);transform-box:view-box;transform-origin:50% 40%}
 .giftbox.open .lid{transform:translateY(-34px) rotate(-14deg)}
 .giftbox .glow{opacity:0;transition:opacity .4s}.giftbox.open .glow{opacity:1}
+.tgitems{list-style:none;margin:2px 0 8px;padding:0;display:grid;gap:6px;text-align:left}.tgitems:empty{display:none}
+.tgitems li{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.28);border-radius:12px;padding:6px 10px;font-weight:700;opacity:0;transform:translateY(6px);animation:tgin .4s ease forwards}
+.tgitems li .av{width:40px;height:auto}.tgitems li .card{width:30px;height:42px;margin:0;flex:none}.tgitems li small{display:block;font-weight:600;opacity:.75}
+@keyframes tgin{to{opacity:1;transform:none}}
+.giftcard.tg{background:linear-gradient(110deg,#6b2a0a,#b4521a 60%,#d9881f)}
 .giftamt{font:900 44px "Playfair Display",serif;color:var(--gold);min-height:52px;font-variant-numeric:tabular-nums}
 #giftBtn{display:flex;gap:6px;justify-content:center;align-items:center;border:2px solid rgba(243,207,107,.4)}
 
@@ -360,6 +365,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .card.back.cb_aurora.cb_aurora,body[data-cb=cb_aurora] .card.back{background:radial-gradient(circle,#fff 0 .8px,transparent 1.5px) 0 0/13px 17px,linear-gradient(165deg,#061a2a 10%,#0d4a5a 35%,#2ee8a0 50%,#7a6bff 68%,#120a30 90%)}
 .card.back.cb_royal.cb_royal,body[data-cb=cb_royal] .card.back{background:radial-gradient(circle,#ffd54a 0 1.6px,#a87000 2px,transparent 2.6px) 0 0/12px 12px,repeating-linear-gradient(45deg,#3a0f6e 0 4px,#4d1a8f 4px 8px);box-shadow:inset 0 0 0 3px #e0b83a,inset 0 0 0 4px #5a2a00}
 .card.back.cb_void.cb_void,body[data-cb=cb_void] .card.back{background:radial-gradient(circle,#fff 0 .8px,transparent 1.4px) 0 0/11px 13px,radial-gradient(circle,#ff9cf6 0 1px,transparent 1.6px) 3px 5px/19px 17px,conic-gradient(from 0deg,#05000f,#3a0f6e,#05000f,#0a3a6e,#05000f,#6e0f4a,#05000f) 0 0/250% 250%;animation:shine 7s linear infinite}
+.card.back.cb_pumpkin.cb_pumpkin,body[data-cb=cb_pumpkin] .card.back{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cellipse cx='13' cy='15' rx='9' ry='7' fill='%23f08a24'/%3E%3Cpath d='M13 8v14M8.5 9.5c-2 3-2 8 0 11M17.5 9.5c2 3 2 8 0 11' stroke='%23b4521a' stroke-width='1.1' fill='none'/%3E%3Cpath d='M13 8.5c0-2 .6-3.5 2-4' stroke='%233d7a1e' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M15 5c2-1 4 0 4 1-2 1-3 0-4-1z' fill='%235aa52b'/%3E%3C/svg%3E") 0 0/26px 26px,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cellipse cx='13' cy='15' rx='9' ry='7' fill='%23f08a24'/%3E%3Cpath d='M13 8v14M8.5 9.5c-2 3-2 8 0 11M17.5 9.5c2 3 2 8 0 11' stroke='%23b4521a' stroke-width='1.1' fill='none'/%3E%3Cpath d='M13 8.5c0-2 .6-3.5 2-4' stroke='%233d7a1e' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M15 5c2-1 4 0 4 1-2 1-3 0-4-1z' fill='%235aa52b'/%3E%3C/svg%3E") 13px 13px/26px 26px,radial-gradient(circle at 50% 40%,#7a3410,#3a1404);box-shadow:inset 0 0 0 3px #e8a317,inset 0 0 0 4px #5a2a00}
 .card.back.cb_holo.cb_holo,body[data-cb=cb_holo] .card.back{background:linear-gradient(135deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.55) 45%,rgba(255,255,255,0) 60%) 0 0/250% 250%,linear-gradient(135deg,#ff6ad5,#c774e8,#ad8cff,#8795e8,#94d0ff,#6affc8,#fff36a,#ff6ad5) 0 0/300% 300%;animation:holo 3.5s linear infinite}
 @keyframes holo{to{background-position:-250% -250%,-300% -300%}}
 .wardbtn{background:linear-gradient(135deg,#c77dff,#7a3cff);color:#fff;box-shadow:0 4px 0 #4a1a9a}
@@ -554,12 +560,17 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 </div></div>
 
 <div class="dialog" id="giftDlg" hidden role="dialog" aria-modal="true" aria-labelledby="giftTitle"><div>
-  <h3 id="giftTitle" class="sign" style="font-size:28px;margin:0">Daily gift</h3>
-  <svg class="giftbox" id="giftBox" viewBox="0 0 120 120" aria-hidden="true"><circle class="glow" cx="60" cy="62" r="52" fill="#ffe27a" fill-opacity=".3"/>
-    <rect x="22" y="56" width="76" height="54" rx="6" fill="#d12a5a"/><rect x="54" y="56" width="12" height="54" fill="#ffd54a"/><rect x="22" y="56" width="76" height="8" fill="#000" opacity=".15"/>
-    <g class="lid"><rect x="16" y="40" width="88" height="18" rx="5" fill="#e8396b"/><rect x="54" y="40" width="12" height="18" fill="#ffd54a"/>
-    <path d="M60 40c-6-14-26-18-26-6 0 7 14 7 26 6zM60 40c6-14 26-18 26-6 0 7-14 7-26 6z" fill="#ffd54a" stroke="#c99412" stroke-width="2"/></g></svg>
+  <h3 id="giftTitle" class="sign" style="font-size:28px;margin:0">Thanksgiving Mega Pack</h3>
+  <svg class="giftbox" id="giftBox" viewBox="0 0 120 120" aria-hidden="true"><circle class="glow" cx="60" cy="62" r="52" fill="#ffb347" fill-opacity=".35"/>
+    <rect x="22" y="56" width="76" height="54" rx="6" fill="#b4521a"/><rect x="22" y="56" width="76" height="54" rx="6" fill="url(#tgStripe)" opacity=".35"/>
+    <rect x="54" y="56" width="12" height="54" fill="#ffd54a"/><rect x="22" y="56" width="76" height="8" fill="#000" opacity=".18"/>
+    <text x="60" y="94" text-anchor="middle" font-size="24">🦃</text>
+    <g class="lid"><rect x="16" y="40" width="88" height="18" rx="5" fill="#d9661f"/><rect x="54" y="40" width="12" height="18" fill="#ffd54a"/>
+    <path d="M60 40c-6-14-26-18-26-6 0 7 14 7 26 6zM60 40c6-14 26-18 26-6 0 7-14 7-26 6z" fill="#ffd54a" stroke="#c99412" stroke-width="2"/>
+    <path d="M30 40l4-9 3 7 4-8 2 10" fill="#c0392b"/><path d="M78 40l3-8 4 6 3-9 3 11" fill="#e8a317"/></g>
+    <defs><pattern id="tgStripe" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="10" fill="#ffd27a"/></pattern></defs></svg>
   <div class="giftamt" id="giftAmt" aria-live="polite"></div>
+  <ul class="tgitems" id="giftItems" aria-live="polite"></ul>
   <p style="margin:0" id="giftTxt">A gift is waiting for you!</p>
   <div class="row"><button class="btn" id="giftOpen">Open it!</button><button class="btn" id="giftClose" hidden>Nice!</button></div>
 </div></div>
@@ -756,7 +767,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
     <h2>Shop</h2>
     <div class="felt" style="background:radial-gradient(90% 70% at 50% 30%,#2a5a46 0%,#10291f 100%)">
       <div class="shophead"><span class="pill">New items in <b id="shTimer">--</b></span></div>
-      <div class="giftcard" id="shGift"><div class="gicon">🎁</div><div class="gtxt"><b>Daily gift</b><span id="shGiftTxt">A free gift every 24 hours</span></div><button class="btn" id="shGiftBtn">Open</button></div>
+      <div class="giftcard tg" id="shGift"><div class="gicon">🦃</div><div class="gtxt"><b>Thanksgiving Mega Pack</b><span id="shGiftTxt">A free mega pack every 24 hours</span></div><button class="btn" id="shGiftBtn">Open</button></div>
       <div class="shsec" style="margin-top:6px"><h3>Boosts</h3><span>Always in stock</span></div>
       <div class="boostgrid" id="shBoost"></div>
       <div class="shsec"><h3>Badge frames</h3><span>Go around your tier badge</span></div>
@@ -1364,6 +1375,7 @@ FRAMES.push(
   {id:'slime',name:'Toxic Slime',rar:2,price:1600000},{id:'sound',name:'Sound Waves',rar:2,price:2600000},{id:'lava',name:'Lava Ring',rar:2,price:3000000},{id:'shuriken',name:'Ninja Stars',rar:2,price:3800000},
   {id:'halo',name:'Electric Halo',rar:3,price:12000000},{id:'dcrown',name:'Diamond Crown',rar:3,price:45000000},
   {id:'infinity',name:'Infinity Loop',rar:4,price:600000000},{id:'supernova',name:'Mango Supernova',rar:4,price:2000000000});
+FRAMES.push({id:'harvest',name:'Harvest Feast',rar:4,price:0,ex:true});
 const RAR=[['Common','#c3ccd6'],['Rare','#5ea8ff'],['Epic','#c77dff'],['Legendary','#ffb52e'],['Mythic','#ff6ad5']];
 const TITLES=[
   {id:'t_rookie',name:'Lucky Rookie',rar:0,price:1000},{id:'t_flip',name:'Coin Flipper',rar:0,price:2000},{id:'t_count',name:'Card Counter',rar:0,price:5000},
@@ -1385,7 +1397,8 @@ const BACKS=[
   {id:'cb_ruby',name:'Ruby Velvet',rar:0,price:2500},{id:'cb_candy',name:'Candy Cane',rar:0,price:4500},
   {id:'cb_ocean',name:'Ocean Waves',rar:1,price:90000},{id:'cb_circuit',name:'Circuit Board',rar:1,price:150000},
   {id:'cb_lava',name:'Lava Cracks',rar:2,price:2500000},{id:'cb_aurora',name:'Aurora Sky',rar:3,price:25000000},
-  {id:'cb_royal',name:'Royal Crest',rar:3,price:45000000},{id:'cb_void',name:'Cosmic Void',rar:4,price:800000000}].map(x=>({...x,kind:'back'}));
+  {id:'cb_royal',name:'Royal Crest',rar:3,price:45000000},{id:'cb_void',name:'Cosmic Void',rar:4,price:800000000},
+  {id:'cb_pumpkin',name:'Pumpkin Patch',rar:2,price:0,ex:true}].map(x=>({...x,kind:'back'}));
 FRAMES.forEach(f=>f.kind='frame');
 const ALLITEMS=[...FRAMES,...TITLES,...BACKS],itemById=id=>ALLITEMS.find(x=>x.id===id);
 const BOOSTS=[{id:'dbl',name:'Money Doubler',mins:10,price:8000000,desc:'Every win pays double the money for 10 minutes. Buying more adds time.'},
@@ -1483,6 +1496,12 @@ function frameSVG(id){if(!id)return null;const u='fx'+(++fxUid)+'_',F=k=>`url(#$
       front:`<circle cx="50" cy="50" r="33" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="76" cy="26" r="3" fill="#fff"/>`+star(80,22,6,'#fff')};
     case'universe':return{back:rg('uv',['rgba(120,60,255,0)','rgba(120,60,255,0)','rgba(255,120,240,.75)','rgba(60,20,140,0)'])+`<circle cx="50" cy="50" r="50" fill="${F('uv')}"/>`+wing('#fff6b0','#ff9cf6','#7a2bb3')+`<g class="fx-rspin">${ring(20,47,(x,y,r,i)=>star(x,y,i%2?2:3.2,i%3?'#fff':'#ffd54a'))}</g>`,
       front:`<g class="fx-spin">${ring(6,43,(x,y,r)=>mango(x,y,.7,r))}<circle cx="93" cy="50" r="3" fill="#5ea8ff"/><circle cx="7" cy="50" r="2.4" fill="#ff6df0"/></g>`+crown(2,16)};
+    case'harvest':{const leaf=(x,y,r,c)=>`<path transform="translate(${x} ${y}) rotate(${r+90}) scale(.62)" d="M0-9L2-4L6-6L5-1L9 0L5 2L6 6L1 4L0 9L-1 4L-6 6L-5 2L-9 0L-5-1L-6-6L-2-4z" fill="${c}" stroke="#5a2300" stroke-width=".8" stroke-linejoin="round"/>`;
+      const feathers=[-60,-40,-20,0,20,40,60].map((a,i)=>`<ellipse cx="50" cy="-2" rx="5" ry="13" fill="${['#8b3a0e','#c0392b','#e8a317','#d9661f','#e8a317','#c0392b','#8b3a0e'][i]}" stroke="#4a1e05" stroke-width=".7" transform="rotate(${a} 50 16)"/>`).join('');
+      return{back:rg('hv',['rgba(255,170,60,0)','rgba(255,170,60,0)','rgba(255,140,40,.55)','rgba(255,140,40,0)'])+`<circle cx="50" cy="50" r="50" fill="${F('hv')}"/>`,
+        front:`<circle cx="50" cy="50" r="40" fill="none" stroke="#e8a317" stroke-width="2.4"/>`+ring(14,43,(x,y,r,i)=>Math.abs(((r%360)+360)%360-270)<40||Math.abs(((r%360)+360)%360-90)<22?'':leaf(x,y,r,['#c0392b','#e8a317','#d9661f','#8b3a0e'][i%4]))+
+          `<g class="fx-pulse">${feathers}<circle cx="50" cy="13" r="5.5" fill="#7a3a12" stroke="#4a1e05"/><circle cx="48.4" cy="11.8" r="1" fill="#fff"/><path d="M51 13l3 1-3 1z" fill="#f3c400"/><path d="M50.5 15.2c.8 1.2.6 2.6-.4 3" stroke="#d32f2f" stroke-width="1.4" fill="none" stroke-linecap="round"/></g>`+
+          `<g transform="translate(50 92)"><ellipse rx="9" ry="6.5" fill="#f08a24" stroke="#8b3a0e" stroke-width=".9"/><path d="M0-6.5v13M-4.5-5.5c-1.8 3-1.8 8 0 11M4.5-5.5c1.8 3 1.8 8 0 11" stroke="#b4521a" stroke-width=".9" fill="none"/><path d="M0-6c0-2 .6-3.4 2-4" stroke="#3d7a1e" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>`}}
     case'sparkle':return{front:ring(12,43,(x,y,r,i)=>star(x,y,i%2?2.3:3.8,i%2?'#fff':'#ffe27a'))};
     case'gum':return{front:ring(10,42,(x,y,r,i)=>`<circle cx="${x}" cy="${y}" r="4.6" fill="${i%2?'#ff7ab8':'#ffa6d2'}" stroke="#d94a8f" stroke-width=".7"/><circle cx="${x-1.5}" cy="${y-1.5}" r="1.2" fill="#fff" opacity=".85"/>`)};
     case'waves':{const wv=(R,A,n,c,w)=>{let d='';for(let k=0;k<=120;k++){const a=k/120*Math.PI*2,rr=R+A*Math.sin(a*n);d+=(k?'L':'M')+(50+Math.cos(a)*rr).toFixed(2)+' '+(50+Math.sin(a)*rr).toFixed(2)}return `<path d="${d}z" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round"/>`};
@@ -1513,7 +1532,7 @@ const dayKey=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)
 function seeded(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19}
   return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);return((h^=h>>>16)>>>0)/4294967296}}
 let stockDay='',stock={frame:[],title:[],back:[]};
-function makeStock(){stockDay=dayKey();const r=seeded('mango'+stockDay),pick=(list,rars,n)=>{const pool=list.filter(f=>rars.includes(f.rar));
+function makeStock(){stockDay=dayKey();const r=seeded('mango'+stockDay),pick=(list,rars,n)=>{const pool=list.filter(f=>rars.includes(f.rar)&&!f.ex);
     for(let i=pool.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]]}return pool.slice(0,n)};
   stock={frame:[...pick(FRAMES,[0],2),...pick(FRAMES,[1],3),...pick(FRAMES,[2],2),...pick(FRAMES,[3],2),...pick(FRAMES,[4],1)],
     title:[...pick(TITLES,[0,1],2),...pick(TITLES,[2],1),...pick(TITLES,[3,4],1)],
@@ -1575,16 +1594,26 @@ $('pGoods').addEventListener('click',e=>{const b=e.target.closest('[data-kind]')
 
 // ---- daily gift ----
 const giftLeft=()=>devFlag('devGift')?-1:giftAt+GIFT_MS-Date.now();
-function giftAmount(){const u=rand(),r=(a,b)=>Math.round((a+rand()*(b-a))/50)*50;
-  return u<.6?r(500,2000):u<.9?r(2000,7500):u<.98?r(10000,25000):r(50000,100000)}
-function openGift(){Sound.click();if(giftLeft()>0){toast(`Next gift in ${clock(giftLeft())}`);return}
+// Thanksgiving Mega Pack: $10k–$10M (big amounts are rarer), the Pumpkin Patch card back, a random Epic frame and the Harvest Feast frame
+function giftAmount(){return Math.round(10000*Math.pow(1000,Math.pow(rand(),1.6))/1000)*1000}
+function packItems(){const own=new Set(shopData.owned),out=[];
+  const give=(id,note)=>{const it=itemById(id);if(!it)return;const had=own.has(id);if(!had){shopData.owned.push(id);own.add(id)}out.push({it,note:had?'Already yours':note})};
+  give('cb_pumpkin','New card back');
+  const epics=FRAMES.filter(f=>f.rar===2&&!f.ex),fresh=epics.filter(f=>!own.has(f.id)),pickE=(fresh.length?fresh:epics)[Math.floor(rand()*(fresh.length?fresh:epics).length)];
+  if(pickE)give(pickE.id,'Random Epic frame');
+  give('harvest','Special Thanksgiving frame');
+  saveShop();return out}
+function openGift(){Sound.click();if(giftLeft()>0){toast(`Next pack in ${clock(giftLeft())}`);return}
   $('giftBox').classList.remove('shake','open');$('giftAmt').textContent='';$('giftOpen').hidden=false;$('giftClose').hidden=true;
-  $('giftTxt').textContent='A gift is waiting for you!';$('giftDlg').hidden=false;$('giftOpen').focus()}
+  $('giftItems').innerHTML='';$('giftTxt').textContent='Your Thanksgiving Mega Pack is ready!';$('giftDlg').hidden=false;$('giftOpen').focus()}
 $('giftOpen').addEventListener('click',()=>{if(giftLeft()>0)return;const amt=giftAmount();giftAt=Date.now();try{Store.setItem('casino-gift',String(giftAt))}catch(e){}
   $('giftOpen').hidden=true;$('giftBox').classList.add('shake');Sound.tick();
   setTimeout(()=>{$('giftBox').classList.remove('shake');$('giftBox').classList.add('open');Sound.big();
     const t0=performance.now();(function f(now){const p=Math.min(1,(now-t0)/900);$('giftAmt').textContent=fmt(Math.round(amt*p*p*(3-2*p)));if(p<1)requestAnimationFrame(f)})(t0);
-    setMoney(money+amt);$('giftTxt').textContent=amt>=50000?'JACKPOT GIFT!':amt>=10000?'Big gift!':'Come back tomorrow for another!';$('giftClose').hidden=false;$('giftClose').focus();tickClock()},900)});
+    setMoney(money+amt);const items=packItems();
+    $('giftItems').innerHTML=items.map(({it,note},i)=>`<li style="animation-delay:${.5+i*.25}s">${it.kind==='back'?`<div class="card back ${it.id} ${it.id}"></div>`:`<span class="av">${avatar(tierOf(money),it.id)}</span>`}<span>${it.name}<small>${note} · ${RAR[it.rar][0]}</small></span></li>`).join('');
+    $('giftTxt').textContent=(amt>=2000000?'MEGA JACKPOT! ':amt>=500000?'Huge pack! ':'')+'Wear your new goodies in the Wardrobe. Another pack in 24 hours!';
+    renderProfile();if(!$('v-shop').hidden)renderShop();$('giftClose').hidden=false;$('giftClose').focus();tickClock()},900)});
 $('giftClose').addEventListener('click',()=>{$('giftDlg').hidden=true});
 $('shGiftBtn').addEventListener('click',openGift);
 
@@ -1592,7 +1621,7 @@ $('shGiftBtn').addEventListener('click',openGift);
 function tickClock(){const gl=giftLeft(),ready=gl<=0;
   document.querySelectorAll('.dotable').forEach(b=>b.classList.toggle('hasdot',ready));
   $('shGift').classList.toggle('ready',ready);$('shGiftBtn').disabled=!ready;$('shGiftBtn').textContent=ready?'Open':'Opened';
-  $('shGiftTxt').innerHTML=ready?'<b class="gready">Ready to open!</b>':`Next gift in <b>${clock(gl)}</b>`;
+  $('shGiftTxt').innerHTML=ready?'<b class="gready">Ready to open!</b>':`Next pack in <b>${clock(gl)}</b>`;
   const m=boostMult(),on=m>1,left=m===3&&devFlag('devTri')?'∞':clock(boostEnd()-Date.now());$('boostPill').hidden=!on;if(on)$('boostPill').innerHTML=`⚡${m}× <b>${left}</b>`;
   $('boostPill').classList.toggle('tri',m===3);$('lBoost').hidden=!on;if(on)$('lBoost').innerHTML=`⚡ ${m}× wins for <b>${left}</b>`;
   if(!$('v-shop').hidden){$('shTimer').textContent=clock(msToMidnight());if(stockDay!==dayKey())renderShop();
