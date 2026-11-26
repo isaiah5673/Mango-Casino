@@ -380,6 +380,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 #fpsHud{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;outline:none}
 .fpstouch{display:none;margin-top:10px}@media (pointer:coarse){.fpstouch{display:flex}#fpsFire{min-width:140px;min-height:56px;font-size:18px}}
 .newtag{display:inline-block;vertical-align:middle;margin-left:6px;padding:3px 9px;border-radius:999px;background:#b6ff3b;color:#14200a;font:900 12px/1 Inter,sans-serif;letter-spacing:.08em;box-shadow:0 0 12px rgba(182,255,59,.55);transform:translateY(-3px)}
+.devkey[hidden]{display:none!important}
 .devkey{position:fixed;right:14px;bottom:14px;z-index:35;width:46px;height:46px;border-radius:50%;border:2px solid rgba(243,207,107,.55);background:rgba(10,30,22,.85);font-size:21px;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.45);display:grid;place-items:center;padding:0}
 .devkey:hover{transform:scale(1.08)}.devkey:focus-visible{outline:3px solid #fff;outline-offset:2px}
 .dialog>div.devbox{max-width:440px;width:100%}
@@ -446,7 +447,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 
 <!-- HOME SCREEN -->
 <section class="home" id="home" aria-label="Home screen">
-  <button class="devkey" id="devKey" aria-label="Developer" title="Developer">🔑</button>
+  <button class="devkey" id="devKey" hidden aria-label="Developer" title="Developer">🔑</button>
   <div class="marquee">
     <div class="fan" aria-hidden="true">
       <div class="card" style="transform:rotate(-18deg)"><span class="c tl">A<br>♠</span><span class="mid">♠</span><span class="c br">A<br>♠</span></div>
@@ -496,7 +497,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
   <div id="devLock">
     <h3 id="devTitle" class="sign" style="font-size:30px;margin:0 0 6px">Developer?</h3>
     <p style="margin:0 0 12px">Enter the developer code.</p>
-    <input id="devCode" class="devcode" type="password" inputmode="numeric" autocomplete="off" maxlength="12" aria-label="Developer code">
+    <input id="devCode" class="devcode" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="20" aria-label="Developer code">
     <div class="auerr" id="devErr" hidden role="alert">Wrong code</div>
     <div class="row"><button class="btn alt" id="devNo">Cancel</button><button class="btn" id="devGo">Enter</button></div>
   </div>
@@ -1211,7 +1212,7 @@ const Auth=(()=>{
   // check now and then for money other players sent you, so it arrives while you're online
   setInterval(async()=>{if(!sessionUser||document.visibilityState==='hidden')return;const db=await getDB();if(!db)return;
     try{const s=await accDoc(db,sessionUser).get();const x=s.exists?(s.data()||{}):{};if(x.banned===true)kick();else if(Math.floor(+x.bonus||0)!==0)pushLoop()}catch(e){}},25000);
-  return{open,top,adminGive,setBan,tip,getDB,myName,save:()=>pushLoop(),get user(){return sessionUser}};
+  return{open,top,adminGive,setBan,tip,getDB,myName,sha:sha256,save:()=>pushLoop(),get user(){return sessionUser}};
 })();
 
 let limboPreview=null;
@@ -1763,6 +1764,11 @@ $('nameIn').value=profile.name;
 $('nameSave').addEventListener('click',()=>{const v=$('nameIn').value.trim().slice(0,20);if(!v)return;profile.name=v;saveProfile();renderProfile();Sound.cash();toast('Name saved!')});
 $('nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('nameSave').click()});
 const Dev=(()=>{let open=false;try{open=sessionStorage.getItem('mc-dev')==='1'}catch(e){}
+  // developer tools belong to the owner's account only
+  const OWNER='mangomaucho',CODE='14d40b61f4cd13e34b0b8be0e55c4e207910ae167c6285f79a2145831423f0cb';
+  const isOwner=()=>Auth.user===OWNER;
+  function guard(){const ok=isOwner();$('devKey').hidden=!ok;if(!ok){if(open){open=false;try{sessionStorage.removeItem('mc-dev')}catch(e){}}$('devDlg').hidden=true}}
+  setInterval(guard,1000);guard();
   const rankLbl=()=>{const on=!!profile.dev;$('devRank').textContent='DEV rank: '+(on?'On':'Off');$('devRank').setAttribute('aria-pressed',on);$('devRank').classList.toggle('green',on);$('devRank').classList.toggle('red',!on)};
   $('devGive').addEventListener('click',async()=>{const name=$('devGiveUser').value.trim(),amt=parseAmt($('devGiveAmt').value),M=$('devGiveMsg');
     if(!name){M.textContent='Type a username first';return}if(!(amt>0)){M.textContent='Type an amount, like 10k or 1m';return}
@@ -1770,9 +1776,9 @@ const Dev=(()=>{let open=false;try{open=sessionStorage.getItem('mc-dev')==='1'}c
     try{const who=await Auth.adminGive(name,amt);M.textContent=`Sent ${fmt(amt)} to ${who}! They get it next time the game saves or they log in.`;Sound.cash();$('devGiveAmt').value=''}
     catch(e){M.textContent=e&&e.message?e.message:'Couldn\'t send. Try again'}finally{$('devGive').disabled=false}});
   $('devRank').addEventListener('click',()=>{profile.dev=!profile.dev;saveProfile();renderProfile();rankLbl();toast(profile.dev?'DEV rank on: it replaces your title while it\'s on':'DEV rank off: your title is back');Sound.cash()});
-  const show=()=>{rankLbl();togLbl();$('devLock').hidden=open;$('devPanel').hidden=!open;$('devErr').hidden=true;$('devCode').value='';if(open)$('devMoney').value=Math.floor(money).toLocaleString('de-DE')};
-  $('devKey').addEventListener('click',()=>{Sound.click();show();$('devDlg').hidden=false;setTimeout(()=>(open?$('devMoney'):$('devCode')).focus(),30)});
-  const tryCode=()=>{if($('devCode').value.trim()==='103050'){open=true;try{sessionStorage.setItem('mc-dev','1')}catch(e){}Sound.big();show();toast('Developer mode unlocked')}
+  const show=()=>{guard();rankLbl();togLbl();$('devLock').hidden=open;$('devPanel').hidden=!open;$('devErr').hidden=true;$('devCode').value='';if(open)$('devMoney').value=Math.floor(money).toLocaleString('de-DE')};
+  $('devKey').addEventListener('click',()=>{if(!isOwner()){guard();return}Sound.click();show();$('devDlg').hidden=false;setTimeout(()=>(open?$('devMoney'):$('devCode')).focus(),30)});
+  const tryCode=()=>{if(isOwner()&&Auth.sha($('devCode').value.trim().toLowerCase())===CODE){open=true;try{sessionStorage.setItem('mc-dev','1')}catch(e){}Sound.big();show();toast('Developer mode unlocked')}
     else{$('devErr').hidden=false;Sound.lose();$('devCode').value='';$('devCode').focus()}};
   $('devGo').addEventListener('click',tryCode);$('devCode').addEventListener('keydown',e=>{if(e.key==='Enter')tryCode()});
   $('devNo').addEventListener('click',()=>{$('devDlg').hidden=true});$('devClose').addEventListener('click',()=>{$('devDlg').hidden=true});
