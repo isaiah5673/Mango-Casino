@@ -907,7 +907,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
     </div>
     <div class="rail"><div class="row" id="pkBet"></div>
       <div class="row"><button class="btn" id="pkDeal">Deal</button><button class="btn green" id="pkCall" hidden>Call</button><button class="btn red" id="pkFold" hidden>Fold</button></div>
-      <div class="small">You and the dealer each get 2 cards, then the flop. Call (1.5× your ante) or fold. Best 5-card hand wins. The dealer needs a pair of 4s or better to qualify; if not, your ante pays and your call comes back.</div></div>
+      <div class="small">You and the dealer each get 2 cards, then the flop. Call (1.5× your ante) or fold. Best 5-card hand wins and pays 1.5× your bets (big hands pay more on the ante). The dealer needs a pair of 4s or better to qualify; if not, your ante pays 1.5× and your call comes back.</div></div>
   </section>
 
   <!-- VIDEO POKER -->
@@ -2214,7 +2214,7 @@ const VPoker=(()=>{
 // ================= POKER (Casino Hold'em vs the dealer) =================
 const Poker=(()=>{
   const NAMES=['High card','Pair','Two pair','Three of a kind','Straight','Flush','Full house','Four of a kind','Straight flush','Royal flush'];
-  const ANTE=[['Royal flush',100],['Straight flush',20],['Four of a kind',10],['Full house',3],['Flush',2],['Straight or less',1]];
+  const ANTE=[['Royal flush',100],['Straight flush',20],['Four of a kind',10],['Full house',3],['Flush',2],['Straight or less',0.5]];
   const rv=c=>c.k==='A'?14:c.k==='K'?13:c.k==='Q'?12:c.k==='J'?11:+c.k;
   let deck=[],P=[],D=[],B=[],phase='bet',ante=0,busy=false;
   function newDeck(){deck=[];for(const [s,r] of SUITS)for(const k of RANKS)deck.push({k,s,red:r});for(let i=deck.length-1;i>0;i--){const j=Math.floor(rand()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}}
@@ -2238,7 +2238,7 @@ const Poker=(()=>{
     `Straight, ${one(h.tb[0])} high`,`Flush, ${one(h.tb[0])} high`,`Full house, ${pairName(h.tb[0])} over ${pairName(h.tb[1])}`,`Four ${pairName(h.tb[0])}`,h.royal?'Royal flush':`Straight flush, ${one(h.tb[0])} high`][h.cat];
   const CALLX=1.5,callOf=a=>Math.round(a*CALLX);
   const qualifies=h=>h.cat>=2||(h.cat===1&&h.tb[0]>=4);
-  const anteMult=h=>h.royal?100:h.cat===8?20:h.cat===7?10:h.cat===6?3:h.cat===5?2:1;
+  const anteMult=h=>h.royal?100:h.cat===8?20:h.cat===7?10:h.cat===6?3:h.cat===5?2:0.5;
   let shownNow=[],seen=new Set(); // cards already on the table don't replay the deal animation
   function cardsHTML(list,showN,bestSet){return list.map((c,i)=>{const face=i<showN&&c;const key=face?c:'back'+i+list.length;
     let h=face?cardHTML(c,i):cardHTML(null,i,true);
@@ -2260,7 +2260,7 @@ const Poker=(()=>{
     if(!take(a)){say('pkMsg','Not enough money for that ante','lose');return}
     ante=a;newDeck();seen=new Set();P=[deck.pop(),deck.pop()];D=[deck.pop(),deck.pop()];B=[deck.pop(),deck.pop(),deck.pop(),deck.pop(),deck.pop()];
     // house edge: now and then the dealer gets a second look and keeps the better two cards
-    if(rand()<0.08){const alt=[deck.pop(),deck.pop()];if(best([...alt,...B]).sc>best([...D,...B]).sc){deck.push(...D);D=alt}else deck.push(...alt)}
+    if(rand()<0.3){const alt=[deck.pop(),deck.pop()];if(best([...alt,...B]).sc>best([...D,...B]).sc){deck.push(...D);D=alt}else deck.push(...alt)}
     phase='decide';Sound.card();render({board:3});
     const h=best([...P,...B.slice(0,3)]);$('pkP').textContent=describe(h);$('pkD').textContent='?';
     say('pkMsg',`You have ${describe(h)}. Call for ${fmt(callOf(ante))} or fold?`)}
@@ -2275,8 +2275,8 @@ const Poker=(()=>{
       $('pkP').textContent=describe(hp);$('pkD').textContent=describe(hd);
       const mult=anteMult(hp),hi=hp.royal?0:hp.cat===8?1:hp.cat===7?2:hp.cat===6?3:hp.cat===5?4:5;
       let back=0,msg,kind;
-      if(!qualifies(hd)){back=ante*(1+mult)+call;msg=`Dealer has only ${describe(hd)} and doesn't qualify. Ante pays ${mult} to 1, call is a push. +${fmt(back-ante-call)}`;kind='win'}
-      else if(hp.sc>hd.sc){back=ante*(1+mult)+call*2;msg=`${describe(hp)} beats ${describe(hd)}${describe(hp)===describe(hd)?' (better kicker)':''}! +${fmt(back-ante-call)}`;kind='win'}
+      if(!qualifies(hd)){back=Math.round(ante*(1+mult)+call);msg=`Dealer has only ${describe(hd)} and doesn't qualify. Ante pays ${mult} to 1, call is a push. +${fmt(back-ante-call)}`;kind='win'}
+      else if(hp.sc>hd.sc){back=Math.round(ante*(1+mult)+call*1.5);msg=`${describe(hp)} beats ${describe(hd)}${describe(hp)===describe(hd)?' (better kicker)':''}! +${fmt(back-ante-call)}`;kind='win'}
       else if(hp.sc===hd.sc){back=ante+call;msg=`Tie with ${describe(hp)}. Bets back`;kind='push'}
       else{msg=`Dealer's ${describe(hd)} beats your ${describe(hp)}${describe(hp)===describe(hd)?' (better kicker)':''}. −${fmt(ante+call)}`;kind='lose'}
       if(back)payout(back,ante+call);
