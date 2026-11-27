@@ -277,6 +277,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .tgitems li .av{width:40px;height:auto}.tgitems li .card{width:30px;height:42px;margin:0;flex:none}.tgitems li small{display:block;font-weight:600;opacity:.75}
 @keyframes tgin{to{opacity:1;transform:none}}
 .giftcard.tg{background:linear-gradient(110deg,#6b2a0a,#b4521a 60%,#d9881f)}
+.giftcard.bf{background:linear-gradient(110deg,#050506,#1c1c22 55%,#3a2e0a);border:2px solid #e0b83a}
 .giftamt{font:900 44px "Playfair Display",serif;color:var(--gold);min-height:52px;font-variant-numeric:tabular-nums}
 #giftBtn{display:flex;gap:6px;justify-content:center;align-items:center;border:2px solid rgba(243,207,107,.4)}
 
@@ -382,6 +383,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .card.back.cb_royal.cb_royal,body[data-cb=cb_royal] .card.back{background:radial-gradient(circle,#ffd54a 0 1.6px,#a87000 2px,transparent 2.6px) 0 0/12px 12px,repeating-linear-gradient(45deg,#3a0f6e 0 4px,#4d1a8f 4px 8px);box-shadow:inset 0 0 0 3px #e0b83a,inset 0 0 0 4px #5a2a00}
 .card.back.cb_void.cb_void,body[data-cb=cb_void] .card.back{background:radial-gradient(circle,#fff 0 .8px,transparent 1.4px) 0 0/11px 13px,radial-gradient(circle,#ff9cf6 0 1px,transparent 1.6px) 3px 5px/19px 17px,conic-gradient(from 0deg,#05000f,#3a0f6e,#05000f,#0a3a6e,#05000f,#6e0f4a,#05000f) 0 0/250% 250%;animation:shine 7s linear infinite}
 .card.back.cb_pumpkin.cb_pumpkin,body[data-cb=cb_pumpkin] .card.back{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cellipse cx='13' cy='15' rx='9' ry='7' fill='%23f08a24'/%3E%3Cpath d='M13 8v14M8.5 9.5c-2 3-2 8 0 11M17.5 9.5c2 3 2 8 0 11' stroke='%23b4521a' stroke-width='1.1' fill='none'/%3E%3Cpath d='M13 8.5c0-2 .6-3.5 2-4' stroke='%233d7a1e' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M15 5c2-1 4 0 4 1-2 1-3 0-4-1z' fill='%235aa52b'/%3E%3C/svg%3E") 0 0/26px 26px,url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cellipse cx='13' cy='15' rx='9' ry='7' fill='%23f08a24'/%3E%3Cpath d='M13 8v14M8.5 9.5c-2 3-2 8 0 11M17.5 9.5c2 3 2 8 0 11' stroke='%23b4521a' stroke-width='1.1' fill='none'/%3E%3Cpath d='M13 8.5c0-2 .6-3.5 2-4' stroke='%233d7a1e' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3Cpath d='M15 5c2-1 4 0 4 1-2 1-3 0-4-1z' fill='%235aa52b'/%3E%3C/svg%3E") 13px 13px/26px 26px,radial-gradient(circle at 50% 40%,#7a3410,#3a1404);box-shadow:inset 0 0 0 3px #e8a317,inset 0 0 0 4px #5a2a00}
+.card.back.cb_bf.cb_bf,body[data-cb=cb_bf] .card.back{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cpath d='M6 9h11l5 5-5 5H6z' fill='%23e0b83a' transform='rotate(-30 14 14)'/%3E%3Ccircle cx='9' cy='12' r='1.6' fill='%23111' transform='rotate(-30 14 14)'/%3E%3C/svg%3E") 0 0/28px 28px,repeating-linear-gradient(135deg,transparent 0 9px,rgba(224,184,58,.25) 9px 10px),#0b0b0d;box-shadow:inset 0 0 0 3px #e0b83a,inset 0 0 0 4px #000}
 .card.back.cb_holo.cb_holo,body[data-cb=cb_holo] .card.back{background:linear-gradient(135deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.55) 45%,rgba(255,255,255,0) 60%) 0 0/250% 250%,linear-gradient(135deg,#ff6ad5,#c774e8,#ad8cff,#8795e8,#94d0ff,#6affc8,#fff36a,#ff6ad5) 0 0/300% 300%;animation:holo 3.5s linear infinite}
 @keyframes holo{to{background-position:-250% -250%,-300% -300%}}
 .wardbtn{background:linear-gradient(135deg,#c77dff,#7a3cff);color:#fff;box-shadow:0 4px 0 #4a1a9a}
@@ -617,14 +619,14 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 </div></div>
 
 <div class="dialog" id="giftDlg" hidden role="dialog" aria-modal="true" aria-labelledby="giftTitle"><div>
-  <h3 id="giftTitle" class="sign" style="font-size:28px;margin:0">Thanksgiving Mega Pack</h3>
-  <svg class="giftbox" id="giftBox" viewBox="0 0 120 120" aria-hidden="true"><circle class="glow" cx="60" cy="62" r="52" fill="#ffb347" fill-opacity=".35"/>
-    <rect x="22" y="56" width="76" height="54" rx="6" fill="#b4521a"/><rect x="22" y="56" width="76" height="54" rx="6" fill="url(#tgStripe)" opacity=".35"/>
+  <h3 id="giftTitle" class="sign" style="font-size:28px;margin:0">Black Friday Mega Pack</h3>
+  <svg class="giftbox" id="giftBox" viewBox="0 0 120 120" aria-hidden="true"><circle class="glow" cx="60" cy="62" r="52" fill="#e0b83a" fill-opacity=".35"/>
+    <rect x="22" y="56" width="76" height="54" rx="6" fill="#111114"/><rect x="22" y="56" width="76" height="54" rx="6" fill="url(#tgStripe)" opacity=".18"/>
     <rect x="54" y="56" width="12" height="54" fill="#ffd54a"/><rect x="22" y="56" width="76" height="8" fill="#000" opacity=".18"/>
-    <text x="60" y="94" text-anchor="middle" font-size="24">🦃</text>
-    <g class="lid"><rect x="16" y="40" width="88" height="18" rx="5" fill="#d9661f"/><rect x="54" y="40" width="12" height="18" fill="#ffd54a"/>
+    <text x="60" y="95" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="15" fill="#e0b83a">SALE</text>
+    <g class="lid"><rect x="16" y="40" width="88" height="18" rx="5" fill="#1c1c22"/><rect x="54" y="40" width="12" height="18" fill="#ffd54a"/>
     <path d="M60 40c-6-14-26-18-26-6 0 7 14 7 26 6zM60 40c6-14 26-18 26-6 0 7-14 7-26 6z" fill="#ffd54a" stroke="#c99412" stroke-width="2"/>
-    <path d="M30 40l4-9 3 7 4-8 2 10" fill="#c0392b"/><path d="M78 40l3-8 4 6 3-9 3 11" fill="#e8a317"/></g>
+    </g>
     <defs><pattern id="tgStripe" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="5" height="10" fill="#ffd27a"/></pattern></defs></svg>
   <div class="giftamt" id="giftAmt" aria-live="polite"></div>
   <ul class="tgitems" id="giftItems" aria-live="polite"></ul>
@@ -824,7 +826,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
     <h2>Shop</h2>
     <div class="felt" style="background:radial-gradient(90% 70% at 50% 30%,#2a5a46 0%,#10291f 100%)">
       <div class="shophead"><span class="pill">New items in <b id="shTimer">--</b></span></div>
-      <div class="giftcard tg" id="shGift"><div class="gicon">🦃</div><div class="gtxt"><b>Thanksgiving Mega Pack</b><span id="shGiftTxt">A free mega pack every 24 hours</span></div><button class="btn" id="shGiftBtn">Open</button></div>
+      <div class="giftcard bf" id="shGift"><div class="gicon">🛍️</div><div class="gtxt"><b>Black Friday Mega Pack</b><span id="shGiftTxt">A free mega pack every 24 hours</span></div><button class="btn" id="shGiftBtn">Open</button></div>
       <div class="shsec" style="margin-top:6px"><h3>Boosts</h3><span>Always in stock</span></div>
       <div class="boostgrid" id="shBoost"></div>
       <div class="shsec"><h3>Badge frames</h3><span>Go around your tier badge</span></div>
@@ -1178,7 +1180,7 @@ const Auth=(()=>{
     const key=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveBits']);
     return b64(await crypto.subtle.deriveBits({name:'PBKDF2',salt:s,iterations:150000,hash:'SHA-256'},key,256))}
   // ---- online accounts: the artifact's shared store, so an account works on any browser ----
-  const SAVE_KEYS=['casino-money','casino-profile','casino-shop','casino-boost','casino-boost3','casino-tgpack','casino-crash','casino-devcode'];
+  const SAVE_KEYS=['casino-money','casino-profile','casino-shop','casino-boost','casino-boost3','casino-bfpack','casino-crash','casino-devcode'];
   let dbP=null,cloudOK=null,cloudMsg='';
   function getDB(){if(!dbP)dbP=new Promise(res=>{let done=false;const fin=v=>{if(!done){done=true;res(v)}};setTimeout(()=>fin(null),8000);
       try{if(window.claude&&typeof window.claude.use==='function')window.claude.use('db').then(fin,()=>fin(null));else fin(fireDB())}catch(e){fin(null)}});return dbP}
@@ -1458,7 +1460,7 @@ FRAMES.push(
   {id:'slime',name:'Toxic Slime',rar:2,price:1600000},{id:'sound',name:'Sound Waves',rar:2,price:2600000},{id:'lava',name:'Lava Ring',rar:2,price:3000000},{id:'shuriken',name:'Ninja Stars',rar:2,price:3800000},
   {id:'halo',name:'Electric Halo',rar:3,price:12000000},{id:'dcrown',name:'Diamond Crown',rar:3,price:45000000},
   {id:'infinity',name:'Infinity Loop',rar:4,price:600000000},{id:'supernova',name:'Mango Supernova',rar:4,price:2000000000});
-FRAMES.push({id:'harvest',name:'Harvest Feast',rar:3,price:0,ex:true});
+FRAMES.push({id:'harvest',name:'Harvest Feast',rar:3,price:0,ex:true},{id:'bfriday',name:'Doorbuster',rar:3,price:0,ex:true});
 const RAR=[['Common','#c3ccd6'],['Rare','#5ea8ff'],['Epic','#c77dff'],['Legendary','#ffb52e'],['Mythic','#ff6ad5']];
 const TITLES=[
   {id:'t_rookie',name:'Lucky Rookie',rar:0,price:1000},{id:'t_flip',name:'Coin Flipper',rar:0,price:2000},{id:'t_count',name:'Card Counter',rar:0,price:5000},
@@ -1481,7 +1483,7 @@ const BACKS=[
   {id:'cb_ocean',name:'Ocean Waves',rar:1,price:90000},{id:'cb_circuit',name:'Circuit Board',rar:1,price:150000},
   {id:'cb_lava',name:'Lava Cracks',rar:2,price:2500000},{id:'cb_aurora',name:'Aurora Sky',rar:3,price:25000000},
   {id:'cb_royal',name:'Royal Crest',rar:3,price:45000000},{id:'cb_void',name:'Cosmic Void',rar:4,price:800000000},
-  {id:'cb_pumpkin',name:'Pumpkin Patch',rar:2,price:0,ex:true}].map(x=>({...x,kind:'back'}));
+  {id:'cb_pumpkin',name:'Pumpkin Patch',rar:2,price:0,ex:true},{id:'cb_bf',name:'Black Friday',rar:3,price:0,ex:true}].map(x=>({...x,kind:'back'}));
 FRAMES.forEach(f=>f.kind='frame');
 const ALLITEMS=[...FRAMES,...TITLES,...BACKS],itemById=id=>ALLITEMS.find(x=>x.id===id);
 const BOOSTS=[{id:'dbl',name:'Money Doubler',mins:10,price:8000000,desc:'Every win pays double the money for 10 minutes. Buying more adds time.'},
@@ -1496,7 +1498,7 @@ const devFlag=k=>{try{return !!(profile&&profile[k])}catch(e){return false}};
 const boostMult=()=>{const n=Date.now();return devFlag('devTri')||n<triUntil?3:n<boostUntil?2:1};
 const boostActive=()=>boostMult()>1;
 const boostEnd=()=>boostMult()===3?triUntil:boostUntil;
-let giftAt=0;try{giftAt=+Store.getItem('casino-tgpack')||0}catch(e){}
+let giftAt=0;try{giftAt=+Store.getItem('casino-bfpack')||0}catch(e){}
 const GIFT_MS=24*3600*1000;
 const clock=ms=>{ms=Math.max(0,ms);const s=Math.ceil(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')};
 
@@ -1579,6 +1581,13 @@ function frameSVG(id){if(!id)return null;const u='fx'+(++fxUid)+'_',F=k=>`url(#$
       front:`<circle cx="50" cy="50" r="33" fill="none" stroke="#fff" stroke-width="2.4"/><circle cx="76" cy="26" r="3" fill="#fff"/>`+star(80,22,6,'#fff')};
     case'universe':return{back:rg('uv',['rgba(120,60,255,0)','rgba(120,60,255,0)','rgba(255,120,240,.75)','rgba(60,20,140,0)'])+`<circle cx="50" cy="50" r="50" fill="${F('uv')}"/>`+wing('#fff6b0','#ff9cf6','#7a2bb3')+`<g class="fx-rspin">${ring(20,47,(x,y,r,i)=>star(x,y,i%2?2:3.2,i%3?'#fff':'#ffd54a'))}</g>`,
       front:`<g class="fx-spin">${ring(6,43,(x,y,r)=>mango(x,y,.7,r))}<circle cx="93" cy="50" r="3" fill="#5ea8ff"/><circle cx="7" cy="50" r="2.4" fill="#ff6df0"/></g>`+crown(2,16)};
+    case'bfriday':{const tagS=(x,y,r)=>`<g transform="translate(${x} ${y}) rotate(${r+90})"><path d="M-5-4h7l4 4-4 4h-7z" fill="#e0b83a" stroke="#6a4e00" stroke-width=".7"/><circle cx="-2.6" cy="0" r="1" fill="#111"/></g>`;
+      const bag=(x,y,c)=>`<g transform="translate(${x} ${y})"><path d="M-6-4h12l1 11h-14z" fill="${c}" stroke="#111" stroke-width=".8"/><path d="M-3-4c0-5 6-5 6 0" fill="none" stroke="#111" stroke-width="1.2"/></g>`;
+      return{back:rg('bfg',['rgba(224,184,58,0)','rgba(224,184,58,0)','rgba(224,184,58,.5)','rgba(224,184,58,0)'])+`<circle cx="50" cy="50" r="50" fill="${F('bfg')}"/>`,
+        front:`<circle cx="50" cy="50" r="41" fill="none" stroke="#0b0b0d" stroke-width="7"/><circle cx="50" cy="50" r="41" fill="none" stroke="#e0b83a" stroke-width="1.6" stroke-dasharray="6 4"/>`+
+          `<g class="fx-rspin">${ring(8,46,(x,y,r)=>tagS(x,y,r))}</g>`+
+          `<g transform="translate(50 9)"><rect x="-17" y="-6.5" width="34" height="13" rx="3" fill="#d32f2f" stroke="#111" stroke-width="1"/><text x="0" y="3.6" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="9.5" fill="#fff">SALE</text></g>`+
+          bag(36,90,'#e0b83a')+bag(50,93,'#111')+bag(64,90,'#d32f2f')}}
     case'harvest':{const leaf=(x,y,r,c)=>`<path transform="translate(${x} ${y}) rotate(${r+90}) scale(.62)" d="M0-9L2-4L6-6L5-1L9 0L5 2L6 6L1 4L0 9L-1 4L-6 6L-5 2L-9 0L-5-1L-6-6L-2-4z" fill="${c}" stroke="#5a2300" stroke-width=".8" stroke-linejoin="round"/>`;
       const feathers=[-60,-40,-20,0,20,40,60].map((a,i)=>`<ellipse cx="50" cy="-2" rx="5" ry="13" fill="${['#8b3a0e','#c0392b','#e8a317','#d9661f','#e8a317','#c0392b','#8b3a0e'][i]}" stroke="#4a1e05" stroke-width=".7" transform="rotate(${a} 50 16)"/>`).join('');
       return{back:rg('hv',['rgba(255,170,60,0)','rgba(255,170,60,0)','rgba(255,140,40,.55)','rgba(255,140,40,0)'])+`<circle cx="50" cy="50" r="50" fill="${F('hv')}"/>`,
@@ -1651,7 +1660,7 @@ function buyBoost(id){const b=BOOSTS.find(x=>x.id===id);if(!b)return;if(money<b.
   if(armed!==id){Sound.click();arm(id);return}armed=null;setMoney(money-b.price);
   if(id==='dbl'){boostUntil=Math.max(Date.now(),boostUntil)+b.mins*60000;Store.setItem('casino-boost',String(boostUntil));toast('Money Doubler on! Wins pay double for 10 minutes')}
   else if(id==='tri'){triUntil=Math.max(Date.now(),triUntil)+b.mins*60000;Store.setItem('casino-boost3',String(triUntil));toast('MEGA TRIPLER on! Wins pay triple for 5 minutes')}
-  else{giftAt=0;Store.setItem('casino-tgpack','0');renderShop();tickClock();Sound.big();openGift();return}
+  else{giftAt=0;Store.setItem('casino-bfpack','0');renderShop();tickClock();Sound.big();openGift();return}
   Sound.big();tickClock();renderShop()}
 function buy(id){const f=itemById(id);if(!f||shopData.owned.includes(id))return;if(money<f.price){toast('Not enough money');return}
   if(armed!==id){Sound.click();arm(id);return}
@@ -1689,19 +1698,19 @@ $('pGoods').addEventListener('click',e=>{const sb=e.target.closest('[data-sell]'
 
 // ---- daily gift ----
 const giftLeft=()=>devFlag('devGift')?-1:giftAt+GIFT_MS-Date.now();
-// Thanksgiving Mega Pack: $10k–$10M (big amounts are rarer), the Pumpkin Patch card back, a random Epic frame and the Harvest Feast frame
+// Black Friday Mega Pack: $10k–$10M (big amounts are rarer), the Black Friday card back, a random Epic frame and the Doorbuster frame
 function giftAmount(){return Math.round(10000*Math.pow(1000,Math.pow(rand(),1.6))/1000)*1000}
 function packItems(){const own=new Set(shopData.owned),out=[];
   const give=(id,note)=>{const it=itemById(id);if(!it)return;const had=own.has(id);if(!had){shopData.owned.push(id);own.add(id)}out.push({it,note:had?'Already yours':note})};
-  give('cb_pumpkin','New card back');
+  give('cb_bf','New card back');
   const epics=FRAMES.filter(f=>f.rar===2&&!f.ex),fresh=epics.filter(f=>!own.has(f.id)),pickE=(fresh.length?fresh:epics)[Math.floor(rand()*(fresh.length?fresh:epics).length)];
   if(pickE)give(pickE.id,'Random Epic frame');
-  give('harvest','Special Thanksgiving frame');
+  give('bfriday','Special Black Friday frame');
   saveShop();return out}
 function openGift(){Sound.click();if(giftLeft()>0){toast(`Next pack in ${clock(giftLeft())}`);return}
   $('giftBox').classList.remove('shake','open');$('giftAmt').textContent='';$('giftOpen').hidden=false;$('giftClose').hidden=true;
-  $('giftItems').innerHTML='';$('giftTxt').textContent='Your Thanksgiving Mega Pack is ready!';$('giftDlg').hidden=false;$('giftOpen').focus()}
-$('giftOpen').addEventListener('click',()=>{if(giftLeft()>0)return;const amt=giftAmount();giftAt=Date.now();try{Store.setItem('casino-tgpack',String(giftAt))}catch(e){}
+  $('giftItems').innerHTML='';$('giftTxt').textContent='Your Black Friday Mega Pack is ready!';$('giftDlg').hidden=false;$('giftOpen').focus()}
+$('giftOpen').addEventListener('click',()=>{if(giftLeft()>0)return;const amt=giftAmount();giftAt=Date.now();try{Store.setItem('casino-bfpack',String(giftAt))}catch(e){}
   $('giftOpen').hidden=true;$('giftBox').classList.add('shake');Sound.tick();
   setTimeout(()=>{$('giftBox').classList.remove('shake');$('giftBox').classList.add('open');Sound.big();
     const t0=performance.now();(function f(now){const p=Math.min(1,(now-t0)/900);$('giftAmt').textContent=fmt(Math.round(amt*p*p*(3-2*p)));if(p<1)requestAnimationFrame(f)})(t0);
@@ -1727,7 +1736,7 @@ setInterval(tickClock,1000);
 // ---------- season ----------
 // 'thanksgiving' = autumn background, falling leaves and Thanksgiving songs.
 // Set to '' to go back to the normal green casino and the original songs.
-const SEASON='thanksgiving';
+const SEASON='';
 (function(){if(SEASON!=='thanksgiving')return;document.body.classList.add('tg');
   const leaf=c=>`<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0-9L2-4L6-6L5-1L9 0L5 2L6 6L1 4L0 9L-1 4L-6 6L-5 2L-9 0L-5-1L-6-6L-2-4z" fill="${c}" stroke="rgba(60,20,0,.5)" stroke-width=".7" stroke-linejoin="round"/><path d="M0-6V9" stroke="rgba(60,20,0,.45)" stroke-width=".7"/></svg>`;
   const make=()=>{const box=document.createElement('div');box.className='leaves';box.setAttribute('aria-hidden','true');const C=['#c0392b','#e8a317','#d9661f','#a0461b','#f0b43a'];
@@ -2011,7 +2020,7 @@ const Dev=(()=>{let open=false;try{open=sessionStorage.getItem('mc-dev')==='1'}c
   return{}})();
 $('clearBtn').addEventListener('click',()=>{Sound.click();$('clearDlg').hidden=false;$('clearNo').focus()});
 $('clearNo').addEventListener('click',()=>{$('clearDlg').hidden=true});
-$('clearYes').addEventListener('click',()=>{try{['casino-money','casino-profile','casino-audio','casino-crash','casino-shop','casino-boost','casino-boost3','casino-tgpack'].forEach(k=>Store.removeItem(k))}catch(e){}
+$('clearYes').addEventListener('click',()=>{try{['casino-money','casino-profile','casino-audio','casino-crash','casino-shop','casino-boost','casino-boost3','casino-bfpack'].forEach(k=>Store.removeItem(k))}catch(e){}
   profile={name:'Player',bets:0,highest:1000};shopData={owned:[],eq:null,eqTitle:null,eqBack:null};boostUntil=0;triUntil=0;giftAt=0;$('nameIn').value='Player';shownTier=null;setMoney(1000);$('clearDlg').hidden=true;toast('All data cleared. Fresh start!')});
 const audioLabels=()=>{$('musicBtn').textContent='Music: '+(Sound.musicOn?'On':'Off');$('sfxBtn').textContent='Sounds: '+(Sound.sfxOn?'On':'Off');$('muteBtn').textContent='♪ '+(Sound.musicOn?'On':'Off')};
 $('musicBtn').addEventListener('click',()=>{Sound.toggleMusic();audioLabels()});$('muteBtn').addEventListener('click',()=>{Sound.toggleMusic();audioLabels()});
@@ -3438,7 +3447,7 @@ function reloadState(){let m=1000;try{const v=JSON.parse(Store.getItem('casino-m
   profile={name:'Player',bets:0,highest:1000};try{const p=JSON.parse(Store.getItem('casino-profile')||'null');if(p&&typeof p==='object')profile={...profile,...p}}catch(e){}
   shopData={owned:[],eq:null,eqTitle:null,eqBack:null};try{const d=JSON.parse(Store.getItem('casino-shop')||'null');if(d&&Array.isArray(d.owned)){const own=d.owned.filter(x=>itemById(x));
     const ok=(id,k)=>own.includes(id)&&itemById(id).kind===k?id:null;shopData={owned:own,eq:ok(d.eq,'frame'),eqTitle:ok(d.eqTitle,'title'),eqBack:ok(d.eqBack,'back')}}}catch(e){}
-  boostUntil=+Store.getItem('casino-boost')||0;triUntil=+Store.getItem('casino-boost3')||0;giftAt=+Store.getItem('casino-tgpack')||0;
+  boostUntil=+Store.getItem('casino-boost')||0;triUntil=+Store.getItem('casino-boost3')||0;giftAt=+Store.getItem('casino-bfpack')||0;
   $('nameIn').value=profile.name;shownTier=null;setMoney(m);applyBack();tickClock();if(!$('v-shop').hidden)renderShop();if(!$('v-wardrobe').hidden)renderGoods(tierOf(money))}
 audioLabels();setMoney(money);go('lobby');tickClock();
 }
