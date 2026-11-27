@@ -463,6 +463,8 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .setrow input[type=range]{flex:1.3;accent-color:#f3cf6b;height:24px;cursor:pointer}
 .setrow output{width:44px;text-align:right;font-variant-numeric:tabular-nums;color:var(--gold)}
 .settog{min-width:76px;min-height:38px;padding:0 12px}
+.setrow input[type=range]:disabled{opacity:.4}
+@media(max-width:520px){.setrow{flex-wrap:wrap}.setrow input[type=range]{flex-basis:100%;order:3}}
 .setbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .gearbtn{font-size:20px;padding:0 12px}
 .chatdot{position:relative}.chatdot.haschat::after{content:"";position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 0 2px #0b2a1e,0 0 10px rgba(255,59,59,.8);animation:dotpulse 1.4s ease-in-out infinite}
@@ -852,8 +854,8 @@ body.calm .fx-spin,body.calm .fx-rspin,body.calm .fx-pulse,body.calm .fx-zap,bod
     <h2>⚙️ Settings</h2>
     <div class="felt setfelt">
       <h3 class="sethd">Sound</h3>
-      <div class="setrow"><label for="setMus">🎵 Music volume</label><input type="range" id="setMus" min="0" max="100" step="1"><output id="setMusV"></output></div>
-      <div class="setrow"><label for="setSfx">🔊 Sound effects</label><input type="range" id="setSfx" min="0" max="100" step="1"><output id="setSfxV"></output></div>
+      <div class="setrow"><label for="setMus">🎵 Music volume</label><input type="range" id="setMus" min="0" max="100" step="1"><output id="setMusV"></output><button class="btn settog" data-set="musicOn"></button></div>
+      <div class="setrow"><label for="setSfx">🔊 Sound effects</label><input type="range" id="setSfx" min="0" max="100" step="1"><output id="setSfxV"></output><button class="btn settog" data-set="sfxOn"></button></div>
       <div class="setrow"><span>🎶 "Now playing" pop-ups</span><button class="btn settog" data-set="songPop"></button></div>
       <h3 class="sethd">Game</h3>
       <div class="setrow"><span>🔴 Red dot for new chat messages</span><button class="btn settog" data-set="chatDot"></button></div>
@@ -3355,13 +3357,13 @@ const Settings=(()=>{const K='casino-settings',D={chatDot:true,showOnline:true,a
   try{o={...D,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){}
   const save=()=>{try{localStorage.setItem(K,JSON.stringify(o))}catch(e){}};
   const apply=()=>{document.body.classList.toggle('calm',!o.anim);if(!o.chatDot)$('homeChat').classList.remove('haschat')};
-  function paint(){$('setMus').value=Sound.musicVol;$('setMusV').textContent=Sound.musicVol+'%';$('setSfx').value=Sound.sfxVol;$('setSfxV').textContent=Sound.sfxVol+'%';
-    document.querySelectorAll('.settog').forEach(b=>{const k=b.dataset.set,on=k==='songPop'?Sound.songPop:!!o[k];b.textContent=on?'On':'Off';b.classList.toggle('green',on);b.classList.toggle('red',!on);b.setAttribute('aria-pressed',on)});
+  function paint(){$('setMus').value=Sound.musicVol;$('setMusV').textContent=Sound.musicVol+'%';$('setSfx').value=Sound.sfxVol;$('setSfxV').textContent=Sound.sfxVol+'%';$('setMus').disabled=!Sound.musicOn;$('setSfx').disabled=!Sound.sfxOn;
+    document.querySelectorAll('.settog').forEach(b=>{const k=b.dataset.set,on=k==='songPop'?Sound.songPop:k==='musicOn'?Sound.musicOn:k==='sfxOn'?Sound.sfxOn:!!o[k];b.textContent=on?'On':'Off';b.classList.toggle('green',on);b.classList.toggle('red',!on);b.setAttribute('aria-pressed',on)});
     $('setAcct').textContent=Auth.user?`Signed in as ${Auth.user}. Volume and these settings are saved on this device.`:'Playing as a guest. Settings are saved on this device.'}
-  $('setMus').addEventListener('input',e=>{Sound.setMusicVol(+e.target.value);$('setMusV').textContent=Sound.musicVol+'%'});
-  $('setSfx').addEventListener('input',e=>{Sound.setSfxVol(+e.target.value);$('setSfxV').textContent=Sound.sfxVol+'%'});
+  $('setMus').addEventListener('input',e=>{Sound.setMusicVol(+e.target.value);paint()});
+  $('setSfx').addEventListener('input',e=>{Sound.setSfxVol(+e.target.value);paint()});
   $('setSfx').addEventListener('change',()=>Sound.click());
-  document.querySelectorAll('.settog').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.set;if(k==='songPop')Sound.songPop=!Sound.songPop;else{o[k]=!o[k];save();apply()}
+  document.querySelectorAll('.settog').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.set;if(k==='songPop')Sound.songPop=!Sound.songPop;else if(k==='musicOn'){if(!Sound.musicOn&&Sound.musicVol===0)Sound.setMusicVol(70);else Sound.toggleMusic()}else if(k==='sfxOn'){if(!Sound.sfxOn&&Sound.sfxVol===0)Sound.setSfxVol(70);else Sound.toggleSfx()}else{o[k]=!o[k];save();apply()}
     if(k==='showOnline')try{Auth.save()}catch(e){}Sound.click();paint()}));
   $('setProfile').addEventListener('click',()=>{Sound.click();go('profile')});
   $('setClear').addEventListener('click',()=>{$('clearBtn').click()});
