@@ -456,6 +456,17 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .tipwho{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px}.tipwho .chname{font-size:20px;cursor:default}
 .tipin{width:100%;box-sizing:border-box;text-align:center;font-size:18px}
 .tipq{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}.tipq .btn{padding:0 4px;font-size:14px;min-height:38px}
+.setfelt{max-width:620px;margin:0 auto;text-align:left}
+.sethd{font:900 13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:14px 0 6px}.sethd:first-child{margin-top:0}
+.setrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.25);margin-bottom:8px;font-weight:700}
+.setrow>label,.setrow>span{flex:1}
+.setrow input[type=range]{flex:1.3;accent-color:#f3cf6b;height:24px;cursor:pointer}
+.setrow output{width:44px;text-align:right;font-variant-numeric:tabular-nums;color:var(--gold)}
+.settog{min-width:76px;min-height:38px;padding:0 12px}
+.setbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gearbtn{font-size:20px;padding:0 12px}
+.chatdot{position:relative}.chatdot.haschat::after{content:"";position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ff3b3b;box-shadow:0 0 0 2px #0b2a1e,0 0 10px rgba(255,59,59,.8);animation:dotpulse 1.4s ease-in-out infinite}
+body.calm .fx-spin,body.calm .fx-rspin,body.calm .fx-pulse,body.calm .fx-zap,body.calm .fx-flick,body.calm .ttl,body.calm .chname.rb{animation:none!important}
 .plgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:6px}
 .plcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 8px 12px;border-radius:16px;background:rgba(0,0,0,.32);border:2px solid rgba(255,255,255,.08);cursor:pointer;color:inherit;font:inherit;text-align:center;transition:transform .12s,border-color .12s}
 .plcard:hover,.plcard:focus-visible{transform:translateY(-2px);border-color:var(--gold)}
@@ -512,11 +523,8 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
       <button class="btn alt dotable" id="homeShop">Shop</button>
       <button class="btn alt" id="homeLb">🏆 Leaderboard</button>
       <button class="btn alt" id="homePl">👥 Players</button>
-      <div class="toggles">
-        <button class="btn alt" id="musicBtn">Music: On</button>
-        <button class="btn alt" id="sfxBtn">Sounds: On</button>
-      </div>
-      <button class="btn alt" id="homeChat">💬 Chat</button>
+      <button class="btn alt chatdot" id="homeChat">💬 Chat</button>
+      <button class="btn alt" id="homeSet">⚙️ Settings</button>
     </div>
     <p class="acct" id="acctLine"></p>
     <p class="small" style="margin-top:6px">Pretend money, just for fun.</p>
@@ -651,7 +659,7 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
     <span class="pill boostpill" id="boostPill" hidden title="Money Doubler">⚡2× <b id="boostLeft">10:00</b></span>
     <span class="pill">Money <b id="money">$1.000</b></span>
     <button class="btn alt" id="lobbyBtn">Games</button>
-    <button class="btn alt" id="muteBtn">♪ On</button>
+    <button class="btn alt gearbtn" id="muteBtn" aria-label="Settings" title="Settings">⚙️</button>
     <button class="btn alt" id="homeBtn">Home</button>
   </div>
 </div>
@@ -840,6 +848,24 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
   </section>
 
   <!-- LEADERBOARD -->
+  <section id="v-settings" hidden>
+    <h2>⚙️ Settings</h2>
+    <div class="felt setfelt">
+      <h3 class="sethd">Sound</h3>
+      <div class="setrow"><label for="setMus">🎵 Music volume</label><input type="range" id="setMus" min="0" max="100" step="1"><output id="setMusV"></output></div>
+      <div class="setrow"><label for="setSfx">🔊 Sound effects</label><input type="range" id="setSfx" min="0" max="100" step="1"><output id="setSfxV"></output></div>
+      <div class="setrow"><span>🎶 "Now playing" pop-ups</span><button class="btn settog" data-set="songPop"></button></div>
+      <h3 class="sethd">Game</h3>
+      <div class="setrow"><span>🔴 Red dot for new chat messages</span><button class="btn settog" data-set="chatDot"></button></div>
+      <div class="setrow"><span>🟢 Show me as online to others</span><button class="btn settog" data-set="showOnline"></button></div>
+      <div class="setrow"><span>✨ Moving effects on badges and titles</span><button class="btn settog" data-set="anim"></button></div>
+      <div class="setrow"><span>✋ Ask before selling items</span><button class="btn settog" data-set="sellAsk"></button></div>
+      <h3 class="sethd">Account</h3>
+      <div class="setbtns"><button class="btn alt" id="setProfile">👤 Edit profile</button><button class="btn red" id="setClear">Clear data</button></div>
+      <p class="small" id="setAcct" style="margin:10px 0 0"></p>
+    </div>
+  </section>
+
   <section id="v-players" hidden>
     <h2>Players</h2>
     <div class="felt" style="background:radial-gradient(90% 70% at 50% 25%,#16324a 0%,#0a1622 100%)">
@@ -1195,7 +1221,7 @@ const Auth=(()=>{
       else if(bonus!==0){let mm=0;try{mm=+JSON.parse(LS.getItem(nsKey(u,'casino-money'))||'0')||0}catch(e){}LS.setItem(nsKey(u,'casino-money'),JSON.stringify(Math.max(0,mm+bonus)))}}catch(e){}
     const upd=+LS.getItem(nsKey(u,'_updated'))||Date.now();
     const sv=localSave(u);let m=0,pn=a.name,fr=null;try{m=Math.floor(+JSON.parse(sv['casino-money']||'0'))||0}catch(e){}try{const pr=JSON.parse(sv['casino-profile']||'{}');if(pr&&pr.name)pn=String(pr.name).slice(0,24);var dv=!!(pr&&pr.dev)}catch(e){}let ti=null;try{const sd=JSON.parse(sv['casino-shop']||'{}');fr=sd.eq||null;ti=sd.eqTitle||null}catch(e){}
-    try{await accDoc(db,u).set({name:a.name,salt:a.salt,alg:a.alg||'p',hash:a.hash,created:a.created||Date.now(),updated:upd,save:sv,money:m,pname:pn,frame:fr,title:ti,dev:typeof dv!=='undefined'&&dv,bonus:0,bonusFrom:'',seen:document.visibilityState==='hidden'?0:Date.now()});cloudOK=true;cloudMsg='';return true}
+    try{await accDoc(db,u).set({name:a.name,salt:a.salt,alg:a.alg||'p',hash:a.hash,created:a.created||Date.now(),updated:upd,save:sv,money:m,pname:pn,frame:fr,title:ti,dev:typeof dv!=='undefined'&&dv,bonus:0,bonusFrom:'',seen:document.visibilityState==='hidden'||(()=>{try{return JSON.parse(localStorage.getItem('casino-settings')||'{}').showOnline===false}catch(e){return false}})()?0:Date.now()});cloudOK=true;cloudMsg='';return true}
     catch(e){cloudOK=false;cloudMsg=e&&e.code==='invalid_argument'?'readonly':'down';return false}finally{paint()}}
   let pushT=0,pushing=false,again=false;
   // heartbeat so other players can see you're online (green dot)
@@ -1688,7 +1714,7 @@ document.querySelectorAll('[data-wtab]').forEach(b=>b.addEventListener('click',(
 $('pWard').addEventListener('click',()=>{Sound.click();go('wardrobe')});
 $('pGoods').addEventListener('click',e=>{const sb=e.target.closest('[data-sell]');
   if(sb){const id=sb.dataset.sell,f=itemById(id);if(!f||!shopData.owned.includes(id)||devFlag('devAll'))return;
-    if(sellSure!==id){document.querySelectorAll('.sell.sure').forEach(x=>{x.classList.remove('sure');x.textContent='Sell '+fmt(sellPrice(itemById(x.dataset.sell)))});
+    if(sellSure!==id&&Settings.get('sellAsk')!==false){document.querySelectorAll('.sell.sure').forEach(x=>{x.classList.remove('sure');x.textContent='Sell '+fmt(sellPrice(itemById(x.dataset.sell)))});
       sellSure=id;sb.classList.add('sure');sb.textContent='Tap again to sell';Sound.click();clearTimeout(sellT);
       sellT=setTimeout(()=>{if(sellSure===id){sellSure=null;if(sb.isConnected){sb.classList.remove('sure');sb.textContent='Sell '+fmt(sellPrice(f))}}},3000);return}
     sellSure=null;clearTimeout(sellT);const amt=sellPrice(f);
@@ -1776,11 +1802,12 @@ const SEASON='';
 
 // ---------- sound: made with the Web Audio API (no sound files) ----------
 const Sound=(()=>{
-  let ctx=null,music=null,sfx=null,musicOn=true,sfxOn=true;
-  try{const a=JSON.parse(localStorage.getItem('casino-audio')||'null');if(a){musicOn=a.m;sfxOn=a.s}}catch(e){}
-  const keep=()=>{try{localStorage.setItem('casino-audio',JSON.stringify({m:musicOn,s:sfxOn}))}catch(e){}};
+  let ctx=null,music=null,sfx=null,musicOn=true,sfxOn=true,mVol=70,sVol=70,songPop=true;
+  try{const a=JSON.parse(localStorage.getItem('casino-audio')||'null');if(a){musicOn=a.m;sfxOn=a.s;if(a.mv>=0)mVol=+a.mv;if(a.sv>=0)sVol=+a.sv;if(a.sp===false)songPop=false}}catch(e){}
+  const mGain=()=>0.6*mVol/100,sGain=()=>1.35*sVol/100;
+  const keep=()=>{try{localStorage.setItem('casino-audio',JSON.stringify({m:musicOn,s:sfxOn,mv:mVol,sv:sVol,sp:songPop}))}catch(e){}};
   function init(){if(ctx)return;try{ctx=new (window.AudioContext||window.webkitAudioContext)();const m=ctx.createGain();m.connect(ctx.destination);
-    music=ctx.createGain();music.gain.value=0.42;const mc=ctx.createDynamicsCompressor();mc.threshold.value=-16;mc.knee.value=10;mc.ratio.value=4;mc.attack.value=0.005;mc.release.value=0.2;music.connect(mc);mc.connect(m);sfx=ctx.createGain();sfx.gain.value=0.95;const sc=ctx.createDynamicsCompressor();sc.threshold.value=-12;sc.knee.value=8;sc.ratio.value=4;sc.attack.value=0.003;sc.release.value=0.15;sfx.connect(sc);sc.connect(m)}catch(e){ctx=null}}
+    music=ctx.createGain();music.gain.value=mGain();const mc=ctx.createDynamicsCompressor();mc.threshold.value=-16;mc.knee.value=10;mc.ratio.value=4;mc.attack.value=0.005;mc.release.value=0.2;music.connect(mc);mc.connect(m);sfx=ctx.createGain();sfx.gain.value=sGain();const sc=ctx.createDynamicsCompressor();sc.threshold.value=-12;sc.knee.value=8;sc.ratio.value=4;sc.attack.value=0.003;sc.release.value=0.15;sfx.connect(sc);sc.connect(m)}catch(e){ctx=null}}
   function tone(f,t,d,{type='sine',vol=.3,out=sfx,glide=0}={}){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
     if(glide)o.frequency.exponentialRampToValueAtTime(glide,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.012);
     g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(out);o.start(t);o.stop(t+d+.02)}
@@ -1860,7 +1887,7 @@ const Sound=(()=>{
     songIdx=order.shift();cur=PLAYLIST[songIdx];const R=rng(songIdx*7919+13),mel={};
     ['A','B'].forEach(k=>mel[k]=compose(cur,cur[k],R,k==='B'));
     tl=[];FORM.forEach((sec,si)=>cur[sec].forEach((c,b)=>{const later=FORM.slice(0,si).filter(x=>x===sec).length;tl.push({c,sec,b,mel:mel[sec]?mel[sec][b]:null,orn:later>=2})}));
-    barPos=0;eighth=0;if(typeof toast==='function'&&!skip)toast(`♪ Now playing: ${cur.title}`);if(typeof onSong==='function')onSong(cur.title)}
+    barPos=0;eighth=0;if(typeof toast==='function'&&!skip&&songPop)toast(`♪ Now playing: ${cur.title}`);if(typeof onSong==='function')onSong(cur.title)}
   let onSong=null;
   function lead(song,f,t,d){const L=song.lead;
     if(L==='marimba'){voice(f,t,Math.min(d,.45),{vol:.11,att:.004});voice(f*4,t,.08,{vol:.02,att:.002})}
@@ -1904,7 +1931,10 @@ const Sound=(()=>{
   function stop(){if(timer){clearInterval(timer);timer=null}}
   function skipSong(){if(!ctx||!musicOn){return}gapUntil=0;pickSong();next=ctx.currentTime+.15}
   const S={start,skipSong,get songTitle(){return cur?cur.title:''},set onSong(f){onSong=f},get musicOn(){return musicOn},get sfxOn(){return sfxOn},
-    toggleMusic(){musicOn=!musicOn;keep();musicOn?start():stop()},toggleSfx(){sfxOn=!sfxOn;keep();if(sfxOn)S.click()},
+    toggleMusic(){musicOn=!musicOn;keep();musicOn?start():stop()},
+    get musicVol(){return mVol},get sfxVol(){return sVol},get songPop(){return songPop},set songPop(v){songPop=!!v;keep()},
+    setMusicVol(v){mVol=Math.max(0,Math.min(100,Math.round(v)));keep();if(music)music.gain.setTargetAtTime(mGain(),ctx.currentTime,.05);if(mVol>0&&!musicOn){musicOn=true;start()}else if(mVol===0&&musicOn){musicOn=false;stop()}},
+    setSfxVol(v){sVol=Math.max(0,Math.min(100,Math.round(v)));keep();if(sfx)sfx.gain.setTargetAtTime(sGain(),ctx.currentTime,.05);sfxOn=sVol>0},toggleSfx(){sfxOn=!sfxOn;keep();if(sfxOn)S.click()},
     click(){if(ok())tone(900,ctx.currentTime,.05,{type:'square',vol:.06})},
     card(){if(!ok())return;const t=ctx.currentTime;noise(t,.09,{vol:.35,freq:2500,q:.6});noise(t+.03,.05,{vol:.15,freq:6000})},
     cash(){if(!ok())return;const t=ctx.currentTime;tone(1568,t,.08,{type:'square',vol:.08});tone(2093,t+.07,.18,{type:'square',vol:.08});noise(t,.06,{vol:.12,freq:5000})},
@@ -1945,8 +1975,8 @@ function refreshBets(){document.querySelectorAll('[data-key]').forEach(el=>{cons
   if(limboPreview)limboPreview()}
 
 // ---------- screens ----------
-const VIEWS=['profile','lobby','leaderboard','players','chat','fps','shop','wardrobe','war','reddog','tcp','dt','ab','c4','board','horse','bingo','poker','bj','roulette','pool','slots','plinko','mines','hilo','limbo','vpoker','baccarat','craps','keno','crash','dice','coin','wheel','scratch'];
-function go(v){VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);window.scrollTo(0,0);if(v==='pool')Pool.draw();if(v==='roulette')Roulette.drawWheel();if(v==='plinko')Plinko.draw();if(v==='crash')Crash.draw();if(v==='wheel')WheelF.draw();if(v==='shop'){renderShop();tickClock()}if(v==='wardrobe')renderGoods(tierOf(money));if(v==='leaderboard')Board.load();if(v==='players')Players.load();if(v==='chat')Chat.open();if(v==='fps')Shooter.render()}
+const VIEWS=['profile','lobby','leaderboard','players','chat','settings','fps','shop','wardrobe','war','reddog','tcp','dt','ab','c4','board','horse','bingo','poker','bj','roulette','pool','slots','plinko','mines','hilo','limbo','vpoker','baccarat','craps','keno','crash','dice','coin','wheel','scratch'];
+function go(v){VIEWS.forEach(x=>$('v-'+x).hidden=x!==v);window.scrollTo(0,0);if(v==='pool')Pool.draw();if(v==='roulette')Roulette.drawWheel();if(v==='plinko')Plinko.draw();if(v==='crash')Crash.draw();if(v==='wheel')WheelF.draw();if(v==='shop'){renderShop();tickClock()}if(v==='wardrobe')renderGoods(tierOf(money));if(v==='leaderboard')Board.load();if(v==='players')Players.load();if(v==='settings')Settings.paint();if(v==='chat')Chat.open();if(v==='fps')Shooter.render()}
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{Sound.click();go(b.dataset.go)}));
 $('toLobby').addEventListener('click',()=>{Sound.click();go('lobby')});$('lobbyBtn').addEventListener('click',()=>{Sound.click();go('lobby')});
 $('homeBtn').addEventListener('click',()=>{Sound.click();$('home').hidden=false});
@@ -2022,9 +2052,9 @@ $('clearBtn').addEventListener('click',()=>{Sound.click();$('clearDlg').hidden=f
 $('clearNo').addEventListener('click',()=>{$('clearDlg').hidden=true});
 $('clearYes').addEventListener('click',()=>{try{['casino-money','casino-profile','casino-audio','casino-crash','casino-shop','casino-boost','casino-boost3','casino-bfpack'].forEach(k=>Store.removeItem(k))}catch(e){}
   profile={name:'Player',bets:0,highest:1000};shopData={owned:[],eq:null,eqTitle:null,eqBack:null};boostUntil=0;triUntil=0;giftAt=0;$('nameIn').value='Player';shownTier=null;setMoney(1000);$('clearDlg').hidden=true;toast('All data cleared. Fresh start!')});
-const audioLabels=()=>{$('musicBtn').textContent='Music: '+(Sound.musicOn?'On':'Off');$('sfxBtn').textContent='Sounds: '+(Sound.sfxOn?'On':'Off');$('muteBtn').textContent='♪ '+(Sound.musicOn?'On':'Off')};
-$('musicBtn').addEventListener('click',()=>{Sound.toggleMusic();audioLabels()});$('muteBtn').addEventListener('click',()=>{Sound.toggleMusic();audioLabels()});
-$('sfxBtn').addEventListener('click',()=>{Sound.toggleSfx();audioLabels()});
+const audioLabels=()=>{};
+$('muteBtn').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('settings')});
+$('homeSet').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('settings')});
 const say=(el,t,c='')=>{$(el).innerHTML=`<span class="${c}">${t}</span>`};
 
 // ---------- cards (Blackjack + Hi-Lo) ----------
@@ -3321,6 +3351,21 @@ const Shooter=(()=>{
   return{render:()=>{ensure();resume()}};
 })();
 
+const Settings=(()=>{const K='casino-settings',D={chatDot:true,showOnline:true,anim:true,sellAsk:true};let o={...D};
+  try{o={...D,...JSON.parse(localStorage.getItem(K)||'{}')}}catch(e){}
+  const save=()=>{try{localStorage.setItem(K,JSON.stringify(o))}catch(e){}};
+  const apply=()=>{document.body.classList.toggle('calm',!o.anim);if(!o.chatDot)$('homeChat').classList.remove('haschat')};
+  function paint(){$('setMus').value=Sound.musicVol;$('setMusV').textContent=Sound.musicVol+'%';$('setSfx').value=Sound.sfxVol;$('setSfxV').textContent=Sound.sfxVol+'%';
+    document.querySelectorAll('.settog').forEach(b=>{const k=b.dataset.set,on=k==='songPop'?Sound.songPop:!!o[k];b.textContent=on?'On':'Off';b.classList.toggle('green',on);b.classList.toggle('red',!on);b.setAttribute('aria-pressed',on)});
+    $('setAcct').textContent=Auth.user?`Signed in as ${Auth.user}. Volume and these settings are saved on this device.`:'Playing as a guest. Settings are saved on this device.'}
+  $('setMus').addEventListener('input',e=>{Sound.setMusicVol(+e.target.value);$('setMusV').textContent=Sound.musicVol+'%'});
+  $('setSfx').addEventListener('input',e=>{Sound.setSfxVol(+e.target.value);$('setSfxV').textContent=Sound.sfxVol+'%'});
+  $('setSfx').addEventListener('change',()=>Sound.click());
+  document.querySelectorAll('.settog').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.set;if(k==='songPop')Sound.songPop=!Sound.songPop;else{o[k]=!o[k];save();apply()}
+    if(k==='showOnline')try{Auth.save()}catch(e){}Sound.click();paint()}));
+  $('setProfile').addEventListener('click',()=>{Sound.click();go('profile')});
+  $('setClear').addEventListener('click',()=>{$('clearBtn').click()});
+  apply();return{paint,get:k=>o[k]}})();
 const Players=(()=>{let busy=false,rows=[],sel=null;const esc=t=>{const s=document.createElement('span');s.textContent=t;return s.innerHTML};
   const ONLINE=150000,isOn=r=>r.id===Auth.user||(r.seen&&Date.now()-r.seen<ONLINE);
   const ago=t=>{if(!t)return 'a while ago';const s=Math.max(0,(Date.now()-t)/1000);return s<90?'just now':s<3600?Math.round(s/60)+' min ago':s<86400?Math.round(s/3600)+' h ago':Math.round(s/86400)+' days ago'};
@@ -3397,11 +3442,11 @@ const Chat=(()=>{let msgs=[],lastT=0,timer=0,running=false,lastSend=0,loaded=fal
     r.docs.forEach(d=>{if(have.has(d.id))return;const x=d.data()||{};if(typeof x.text!=='string')return;
       msgs.push({id:d.id,user:String(x.user||''),name:String(x.name||x.user||'Player').slice(0,24),text:x.text.slice(0,200),t:+x.t||0,tier:+x.tier||0,dev:x.dev===true,sys:x.sys===true});fresh=true});
     msgs.sort((a,b)=>a.t-b.t);if(msgs.length>120)msgs=msgs.slice(-120);msgs.forEach(m=>{if(m.t>lastT)lastT=m.t});
-    if(fresh||!loaded){render()}loaded=true;refreshLive();return true}
+    if(fresh||!loaded){render()}loaded=true;refreshLive();if(!$('v-chat').hidden){const lm=msgs.filter(x=>!x.sys).slice(-1)[0];if(lm)markSeen(lm.t)}return true}
   async function loop(){if($('v-chat').hidden){running=false;return}
     if(document.visibilityState!=='hidden'){try{await fetchNew();note('Tap a player\'s name to tip them.')}catch(e){note('Couldn\'t reach the chat. Trying again…')}}
     timer=setTimeout(loop,4000)}
-  function open(){paintBar();if(!loaded)L().innerHTML='<li class="chempty">Loading chat…</li>';else render();if(!running){running=true;clearTimeout(timer);loop()}}
+  function open(){paintBar();$('homeChat').classList.remove('haschat');if(!loaded)L().innerHTML='<li class="chempty">Loading chat…</li>';else render();if(!running){running=true;clearTimeout(timer);loop()}}
   async function post(obj){const db=await Auth.getDB();if(!db)throw new Error('offline');const id=obj.t+'-'+(Auth.user||'x')+'-'+Math.floor(Math.random()*1e6);await db.doc('mango_chat/'+id).set(obj)}
   async function send(){const me=Auth.user;if(!me){toast('Log in to an account to chat');return}
     const text=$('chIn').value.replace(/\s+/g,' ').trim().slice(0,200);if(!text)return;
@@ -3426,7 +3471,15 @@ const Chat=(()=>{let msgs=[],lastT=0,timer=0,running=false,lastSend=0,loaded=fal
       try{await post({user:Auth.user,name:Auth.myName(),text:`💸 ${Auth.myName()} tipped ${tipTo.name} ${fmt(amt)}!`,t:Date.now(),tier:tierOf(money),dev:!!profile.dev,sys:true});fetchNew()}catch(e){}
       setTimeout(()=>{if(!$('tipDlg').hidden)$('tipDlg').hidden=true},1400)}
     catch(e){M.textContent=e&&e.message?e.message:'Couldn\'t send the tip. Try again.'}finally{$('tipGo').disabled=false}});
-  return{open,openTip}})();
+  let seenT=0;try{seenT=+localStorage.getItem('mc-chat-seen')||0;if(!seenT){seenT=Date.now();localStorage.setItem('mc-chat-seen',String(seenT))}}catch(e){seenT=Date.now()}
+  const markSeen=t=>{if(t>seenT){seenT=t;try{localStorage.setItem('mc-chat-seen',String(t))}catch(e){}}$('homeChat').classList.remove('haschat')};
+  async function peek(){if(!$('v-chat').hidden){const m=msgs.filter(x=>!x.sys).slice(-1)[0];if(m)markSeen(m.t);return}
+    if(!Settings.get('chatDot')||document.visibilityState==='hidden')return;const db=await Auth.getDB();if(!db)return;
+    try{const r=await db.collection('mango_chat').orderBy('t','desc').limit(6).get();const m=r.docs.map(d=>d.data()||{}).find(x=>x.sys!==true&&typeof x.text==='string');
+      if(!m)return;
+      $('homeChat').classList.toggle('haschat',(+m.t||0)>seenT&&m.user!==Auth.user)}catch(e){}}
+  setTimeout(peek,4000);setInterval(peek,20000);
+  return{open,openTip,peek}})();
 // ---- admin pop-up to everyone online (stored as a special doc next to the accounts) ----
 const Notice=(()=>{const ID='mango_accounts/-notice-',LIFE=15*60*1000,TXT='The game is updating. Please leave to make sure you don\'t lose your progress.';
   let seen=0;try{seen=+sessionStorage.getItem('mc-notice')||0}catch(e){}
