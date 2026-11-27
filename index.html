@@ -392,6 +392,12 @@ h2{font:900 clamp(28px,4.5vw,40px)/1.1 "Playfair Display",serif;margin:4px 0 12p
 .wdtabs button{min-height:44px;border:0;border-radius:10px;background:transparent;color:var(--ink);font:700 14px Inter,sans-serif;cursor:pointer}
 .wdtabs button small{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:rgba(255,255,255,.15);font-size:11px}
 .wdtabs button.on{background:var(--gold);color:#3a2706}.wdtabs button.on small{background:rgba(0,0,0,.15)}
+.witem{display:flex;flex-direction:column;gap:5px;align-items:stretch}
+.goods.wd .witem>button.sell{width:110px;min-height:0;padding:5px 4px;border-radius:10px;border:1.5px solid rgba(255,120,120,.5);background:rgba(120,20,20,.35);color:#ffd6d6;font:800 11px Inter,sans-serif;display:block;box-shadow:none}
+.goods.wd .witem>button.sell:hover{background:rgba(170,30,30,.55)}
+.goods.wd .witem>button.sell.sure{background:#d14040;color:#fff;border-color:#ff9a9a;animation:sellpulse .6s ease-in-out infinite alternate}
+@keyframes sellpulse{from{box-shadow:0 0 0 0 rgba(255,90,90,.6)}to{box-shadow:0 0 0 5px rgba(255,90,90,0)}}
+.witem .nosell{font:700 10px Inter,sans-serif;opacity:.55;text-align:center;padding:4px 0}
 .goods.wd button{width:110px;padding:8px 6px;font-size:12px}.goods.wd .av{width:80px}.goods.wd .none{width:80px}
 .goods.wd .gt,.goods.wd .gb{min-height:80px;height:80px}.goods.wd .gb .card{width:52px;height:74px}
 .goods.wd button.r3{border-color:rgba(255,181,46,.5)}.goods.wd button.r4{border-color:rgba(255,106,213,.6)}.goods.wd button.on{border-color:var(--gold);background:rgba(243,207,107,.15)}
@@ -1655,19 +1661,31 @@ function equip(id,on){const f=itemById(id);if(!f)return;shopData[slotOf(f.kind)]
 $('v-shop').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
   if(b.dataset.buy)buy(b.dataset.buy);else if(b.dataset.equip)equip(b.dataset.equip,true);else if(b.dataset.unequip)equip(b.dataset.unequip,false);else if(b.dataset.boost)buyBoost(b.dataset.boost)});
 let wTab='frame';
+// selling: you get back half of the item's shop price
+const sellPrice=f=>Math.floor((f.price||0)/2);
+const sellBtn=f=>devFlag('devAll')?'':f.ex||!f.price?'<span class="nosell">Can\'t be sold</span>':`<button class="sell" data-sell="${f.id}" aria-label="Sell ${f.name} for ${fmt(sellPrice(f))}">Sell ${fmt(sellPrice(f))}</button>`;
+let sellSure=null,sellT=0;
 function renderGoods(t){const L={frame:FRAMES,title:TITLES,back:BACKS}[wTab],cur=shopData[slotOf(wTab)];
   const show=f=>wTab==='frame'?avatar(t,f.id):wTab==='title'?`<span class="gt">${titleHTML(f.id)}</span>`:`<span class="gb">${backHTML(f.id)}</span>`;
   const own=L.filter(f=>shopData.owned.includes(f.id));
   document.querySelectorAll('[data-wtab]').forEach(b=>{const k=b.dataset.wtab,n={frame:FRAMES,title:TITLES,back:BACKS}[k].filter(f=>shopData.owned.includes(f.id)).length;
     b.classList.toggle('on',k===wTab);b.setAttribute('aria-selected',k===wTab);b.innerHTML=`${{frame:'Badge frames',title:'Titles',back:'Card backs'}[k]} <small>${n}</small>`});
-  $('pGoods').innerHTML=`<div class="goods wd"><button data-kind="${wTab}" data-eq="" class="${cur?'':'on'}"><span class="none">∅</span>None</button>${own.map(f=>`<button data-kind="${wTab}" data-eq="${f.id}" class="${cur===f.id?'on':''} r${f.rar}">${show(f)}<span>${f.name}</span></button>`).join('')}</div>`+
+  $('pGoods').innerHTML=`<div class="goods wd"><button data-kind="${wTab}" data-eq="" class="${cur?'':'on'}"><span class="none">∅</span>None</button>${own.map(f=>`<div class="witem"><button data-kind="${wTab}" data-eq="${f.id}" class="${cur===f.id?'on':''} r${f.rar}">${show(f)}<span>${f.name}</span></button>${sellBtn(f)}</div>`).join('')}</div>`+
     (own.length?'':`<p class="small" style="margin-top:10px">You don't own any ${{frame:'badge frames',title:'titles',back:'card backs'}[wTab]} yet. Find them in the Shop!</p>`);
   const s2=document.createElement('span');s2.textContent=profile.name;
   $('wdAv').innerHTML=avatar(t,shopData.eq);$('wdName').innerHTML=s2.innerHTML;$('wdTitle').innerHTML=myTag()||'<span class="small">No title</span>';
   $('wdBack').innerHTML=backHTML(shopData.eqBack||'')+'<span class="small">Card back</span>'}
 document.querySelectorAll('[data-wtab]').forEach(b=>b.addEventListener('click',()=>{wTab=b.dataset.wtab;Sound.click();renderGoods(tierOf(money))}));
 $('pWard').addEventListener('click',()=>{Sound.click();go('wardrobe')});
-$('pGoods').addEventListener('click',e=>{const b=e.target.closest('[data-kind]');if(!b)return;shopData[slotOf(b.dataset.kind)]=b.dataset.eq||null;saveShop();Sound.cash();renderProfile()});
+$('pGoods').addEventListener('click',e=>{const sb=e.target.closest('[data-sell]');
+  if(sb){const id=sb.dataset.sell,f=itemById(id);if(!f||!shopData.owned.includes(id)||devFlag('devAll'))return;
+    if(sellSure!==id){document.querySelectorAll('.sell.sure').forEach(x=>{x.classList.remove('sure');x.textContent='Sell '+fmt(sellPrice(itemById(x.dataset.sell)))});
+      sellSure=id;sb.classList.add('sure');sb.textContent='Tap again to sell';Sound.click();clearTimeout(sellT);
+      sellT=setTimeout(()=>{if(sellSure===id){sellSure=null;if(sb.isConnected){sb.classList.remove('sure');sb.textContent='Sell '+fmt(sellPrice(f))}}},3000);return}
+    sellSure=null;clearTimeout(sellT);const amt=sellPrice(f);
+    shopData.owned=shopData.owned.filter(x=>x!==id);['eq','eqTitle','eqBack'].forEach(k=>{if(shopData[k]===id)shopData[k]=null});
+    saveShop();if(typeof applyBack==='function')applyBack();setMoney(money+amt);Sound.cash();toast(`Sold ${f.name} for ${fmt(amt)}`);renderProfile();if(!$('v-wardrobe').hidden)renderGoods(tierOf(money));if(!$('v-shop').hidden)renderShop();return}
+  const b=e.target.closest('[data-kind]');if(!b)return;shopData[slotOf(b.dataset.kind)]=b.dataset.eq||null;saveShop();Sound.cash();renderProfile()});
 
 // ---- daily gift ----
 const giftLeft=()=>devFlag('devGift')?-1:giftAt+GIFT_MS-Date.now();
