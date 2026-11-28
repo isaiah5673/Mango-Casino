@@ -277,19 +277,19 @@ body.calm .gtx,body.calm .card.back.cb_xnorth{animation:none!important}
 .ab-doors{max-width:min(280px,30vh)}
 .ab-h{font-size:clamp(22px,4.2vh,36px)}
 .ab-sub{font-size:13px}
-.homead{flex:none;width:100%;max-width:640px;display:flex;align-items:center;gap:12px;border:0;cursor:pointer;font:inherit;color:#fff;text-align:left;padding:8px 14px;border-radius:16px;
-  background:linear-gradient(#2a0f3a,#2a0f3a) padding-box,linear-gradient(90deg,#ff4d4d,#ffa64d,#fff04d,#5cff7a,#4dc3ff,#b04dff,#ff4d4d) border-box;border:3px solid transparent;background-size:100% 100%,200% 100%;animation:adborder 4s linear infinite;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .15s}
-.homead:hover{transform:translateY(-2px)}.homead:focus-visible{outline:3px solid #fff;outline-offset:3px}
-@keyframes adborder{to{background-position:0 0,-200% 0}}
-.ad-packs{display:flex;flex:none}.ad-packs svg{width:clamp(34px,6vh,46px);height:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}.ad-packs svg:first-child{transform:rotate(-10deg)}.ad-packs svg+svg{margin-left:-10px;transform:rotate(8deg)}
-.ad-txt{display:grid;gap:1px;flex:1;min-width:0}.ad-kick{font:900 10px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#7dffb0}
-.ad-txt b{font-size:clamp(14px,2.2vh,17px);background:linear-gradient(90deg,#ff8a8a,#ffe27a,#7dffb0,#7fc8ff,#e29aff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.ad-sub{font-size:12px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ad-go{flex:none;font:900 13px Inter,sans-serif;background:#ffd54a;color:#3a2706;padding:7px 12px;border-radius:999px}
+.newstrip{flex:none;width:100%;max-width:640px;display:flex;align-items:center;gap:12px;border:0;cursor:pointer;font:inherit;color:#fff;text-align:left;padding:8px 14px;border-radius:16px;
+  background:linear-gradient(#2a0f3a,#2a0f3a) padding-box,linear-gradient(90deg,#ff4d4d,#ffa64d,#fff04d,#5cff7a,#4dc3ff,#b04dff,#ff4d4d) border-box;border:3px solid transparent;background-size:100% 100%,200% 100%;animation:nsborder 4s linear infinite;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .15s}
+.newstrip:hover{transform:translateY(-2px)}.newstrip:focus-visible{outline:3px solid #fff;outline-offset:3px}
+@keyframes nsborder{to{background-position:0 0,-200% 0}}
+.ns-packs{display:flex;flex:none}.ns-packs svg{width:clamp(34px,6vh,46px);height:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5))}.ns-packs svg:first-child{transform:rotate(-10deg)}.ns-packs svg+svg{margin-left:-10px;transform:rotate(8deg)}
+.ns-txt{display:grid;gap:1px;flex:1;min-width:0}.ns-kick{font:900 10px Inter,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#7dffb0}
+.ns-txt b{font-size:clamp(14px,2.2vh,17px);background:linear-gradient(90deg,#ff8a8a,#ffe27a,#7dffb0,#7fc8ff,#e29aff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ns-sub{font-size:12px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ns-go{flex:none;font:900 13px Inter,sans-serif;background:#ffd54a;color:#3a2706;padding:7px 12px;border-radius:999px}
+body.calm .newstrip{animation:none}
 .home .acct{margin:6px 0 0;font-size:12px;flex:none}.home .hfoot{margin:2px 0 0;font-size:11px;flex:none}
 @media(max-height:720px){.sub-games{display:none}.ab-sub{display:none}}
-@media(max-width:600px){.sub-games{display:none}.ad-go{display:none}.homead{padding:6px 10px}}
-body.calm .homead{animation:none}
+@media(max-width:600px){.sub-games{display:none}.ns-go{display:none}.newstrip{padding:6px 10px}}
 @media(max-width:600px){.homepanel{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:10px;padding-left:10px;padding-right:10px}.advbanner{padding:10px 6px}.ab-sub{display:none}
   .ab-h{font-size:21px}.ab-cta{font-size:12px;padding:6px 10px}.ab-timer{font-size:10.5px;padding:3px 7px}.menu.hp-menu .btn{font-size:13px;padding:0 4px}.ab-kick{font-size:9px}}
 /* advent calendar */
@@ -749,10 +749,10 @@ body.calm .fx-spin,body.calm .fx-rspin,body.calm .fx-pulse,body.calm .fx-zap,bod
       <span class="rs-n" id="rsN">0 players in</span>
       <button class="btn green" id="rsJoin">Join the rain</button><button class="btn alt" id="rsTip">💸 Tip the rain</button>
     </aside>
-    <button class="homead" id="homeAd" aria-label="New in the shop: Gradients Pack and Christmas Pack. Go to the shop">
-      <span class="ad-packs" id="adPacks" aria-hidden="true"></span>
-      <span class="ad-txt"><span class="ad-kick">✨ New in the shop</span><b>Gradients Pack &amp; Christmas Pack</b><span class="ad-sub">Color your chat messages · 25 Christmas 2026 items</span></span>
-      <span class="ad-go">Shop now →</span>
+    <button class="newstrip" id="homeNew" aria-label="New in the shop: Gradients Pack and Christmas Pack. Go to the shop">
+      <span class="ns-packs" id="nsPacks" aria-hidden="true"></span>
+      <span class="ns-txt"><span class="ns-kick">✨ New in the shop</span><b>Gradients Pack &amp; Christmas Pack</b><span class="ns-sub">Color your chat messages · 25 Christmas 2026 items</span></span>
+      <span class="ns-go">Shop now →</span>
     </button>
     <p class="acct" id="acctLine"></p>
   </div>
@@ -2619,7 +2619,7 @@ $('homePl').addEventListener('click',()=>{$('home').hidden=true;Sound.click();So
 $('homeChat').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('chat')});
 $('homeShop').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('shop')});
 $('advBanner').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('advent')});
-$('homeAd').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('shop');setTimeout(()=>{const el=$('shPacks');if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},60)});
+$('homeNew').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('shop');setTimeout(()=>{const el=$('shPacks');if(el)el.scrollIntoView({behavior:'smooth',block:'center'})},60)});
 $('profBtn').addEventListener('click',()=>{$('home').hidden=true;Sound.click();Sound.start();go('profile')});
 $('meBtn').addEventListener('click',()=>{Sound.click();go('profile')});
 $('nameIn').value=profile.name;
@@ -4936,7 +4936,7 @@ function reloadState(){isaiahFix();try{setTimeout(()=>Rain.poll(),500)}catch(e){
 audioLabels();setMoney(money);go('lobby');tickClock();
 // music starts as soon as you join: right away if the browser allows it, otherwise on your very first tap, click or key press anywhere
 try{Sound.start()}catch(e){}
-try{$('adPacks').innerHTML=['xmas','grads'].map(id=>packSVG(PACKS.find(p=>p.id===id))).join('')}catch(e){}
+try{$('nsPacks').innerHTML=['xmas','grads'].map(id=>packSVG(PACKS.find(p=>p.id===id))).join('')}catch(e){}
 ['pointerdown','touchstart','keydown'].forEach(ev=>window.addEventListener(ev,function wake(){try{Sound.start()}catch(e){}['pointerdown','touchstart','keydown'].forEach(x=>window.removeEventListener(x,wake,true))},{capture:true,passive:true}));
 if(isaiahFix())reloadState();
 }
