@@ -1404,7 +1404,7 @@ body.calm .fx-spin,body.calm .fx-rspin,body.calm .fx-pulse,body.calm .fx-zap,bod
       <div class="msg" id="chMsg" aria-live="polite"><span>Pick a bet and start a game</span></div>
     </div>
     <div class="rail"><div class="row" id="chBet"></div><div class="row"><button class="btn" id="chGo">Start game</button><button class="btn red" id="chResign" hidden>Resign</button></div>
-      <div class="small" id="chHelp">You play White against the AI. Tap a piece, then tap where it should go. Checkmate wins 2× your bet, a draw gives your bet back. Pawns that reach the end become queens.</div></div>
+      <div class="small" id="chHelp">You play White against the AI. The AI plays on Hard, and on Extreme when you bet $50.000.000 or more. Tap a piece, then tap where it should go. Checkmate wins 2× your bet, a draw gives your bet back. Pawns that reach the end become queens.</div></div>
   </section>
 
   <!-- DARTS -->
@@ -3877,18 +3877,21 @@ const Chess=(()=>{
     Q:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,-10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,-10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
     K:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,-20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,20,20,0,0,0,0,20,20,20,30,10,0,0,10,30,20]};
   function evalB(b){let v=0;for(let i=0;i<64;i++){const p=b[i];if(!p)continue;const u=up(p);if(isW(p))v+=VAL[u]+PST[u][i];else v-=VAL[u]+PST[u][(7-(i>>3))*8+(i&7)]}return v}
-  function search(s,d,a,bt,nodes){if(nodes.n++>60000)return evalB(s.b)*(s.turn==='w'?1:-1);
+  function search(s,d,a,bt,nodes){if(nodes.n++>nodes.max)return evalB(s.b)*(s.turn==='w'?1:-1);
     const ms=legal(s);if(!ms.length)return inCheck(s)?-99999-d:0;if(d===0){return quies(s,a,bt,nodes,3)}
     ms.sort((x,y)=>(s.b[y.t]?VAL[up(s.b[y.t])]:0)-(s.b[x.t]?VAL[up(s.b[x.t])]:0)+(y.pr?800:0)-(x.pr?800:0));
     for(const m of ms){const v=-search(make(s,m),d-1,-bt,-a,nodes);if(v>=bt)return v;if(v>a)a=v}return a}
-  function quies(s,a,bt,nodes,depth){const stand=evalB(s.b)*(s.turn==='w'?1:-1);if(stand>=bt||depth===0||nodes.n++>60000)return stand;if(stand>a)a=stand;
+  function quies(s,a,bt,nodes,depth){const stand=evalB(s.b)*(s.turn==='w'?1:-1);if(stand>=bt||depth===0||nodes.n++>nodes.max)return stand;if(stand>a)a=stand;
     for(const m of pseudo(s).filter(m=>s.b[m.t])){const n=make(s,m);if(attacked(n.b,kingSq(n.b,s.turn),n.turn))continue;const v=-quies(n,-bt,-a,nodes,depth-1);if(v>=bt)return v;if(v>a)a=v}return a}
-  function aiMove(s,depth){const ms=legal(s),nodes={n:0};let best=null,bv=-1e9;
-    for(const m of ms.sort(()=>rand()-.5)){const v=-search(make(s,m),depth-1,-1e9,-bv,nodes)+(rand()*12);if(v>bv){bv=v;best=m}}return best}
+  function aiMove(s,L){const ms=legal(s),nodes={n:0,max:L.cap};let best=null,bv=-1e9;
+    if(rand()<L.slip)return ms[Math.floor(rand()*ms.length)]; // Easy sometimes just plays any move
+    for(const m of ms.sort(()=>rand()-.5)){const v=-search(make(s,m),L.depth-1,-1e9,-bv+L.noise,nodes)+rand()*L.noise;if(v>bv){bv=v;best=m}}return best}
   // ---- game ----
   let anims=[];let S=initial(),mode='ai',my='w',playing=false,stake=0,sel=-1,last=null,conn=null,oppName='AI',moveT=0,capW=[],capB=[],thinking=false;
   const MOVE_MS=90000,finder=Net.finder({box:'cqQ',txt:'cqQTxt',sub:'cqQSub',cancel:'cqQCancel',onIdle:()=>{if(!playing){say('chMsg','Pick a bet and press Queue to find a player');paint()}}});
-  const depth=()=>stake>=1e6?3:2;
+  // the bigger the bet, the stronger the AI
+  const LEVELS=[{min:0,name:'Hard',depth:3,noise:6,slip:0,cap:120000},{min:5e7,name:'Extreme',depth:4,noise:2,slip:0,cap:300000}];
+  const level=()=>LEVELS.filter(l=>stake>=l.min).pop();
   function sqName(i){return 'abcdefgh'[i&7]+(8-(i>>3))}
   function paint(){const bd=$('chBoard'),flip=my==='b',ms=sel>=0&&playing&&S.turn===my?legal(S).filter(m=>m.f===sel):[],chk=playing||S.hist.length?(inCheck(S)?kingSq(S.b,S.turn):-1):-1;let h='';
     for(let k=0;k<64;k++){const i=flip?63-k:k,[r,c]=RC(i),p=S.b[i],tgt=ms.find(m=>m.t===i);
@@ -3915,12 +3918,12 @@ const Chess=(()=>{
       const d=Math.min(420,180+Math.hypot(fr.left-tr.left,fr.top-tr.top)*.6);fly.style.transition=`transform ${d}ms cubic-bezier(.3,.7,.3,1)`;fly.style.transform='translate(0,0)';
       setTimeout(()=>{pc.style.visibility='';fly.remove()},d+20)})}
   function begin(myColor){S=initial();S.hist=[key(S)];my=myColor;playing=true;sel=-1;last=null;capW=[];capB=[];moveT=Date.now();
-    say('chMsg',my==='w'?(mode==='net'?`You vs ${esc(oppName)}: you're White, you move first`:'Your move! You play White'):`You vs ${esc(oppName)}: you're Black, ${esc(oppName)} moves first`,'');paint();Sound.cash()}
+    say('chMsg',my==='w'?(mode==='net'?`You vs ${esc(oppName)}: you're White, you move first`:`Your move! You play White · AI level: ${level().name}`):`You vs ${esc(oppName)}: you're Black, ${esc(oppName)} moves first`,'');paint();Sound.cash()}
   function start(){if(playing)return;if(!take(bets.chess)){say('chMsg','Not enough money for that bet','lose');return}stake=bets.chess;oppName='AI';begin('w')}
   function apply(m){const mover=S.turn,n=make(S,m);anims=[{f:m.f,t:m.t}];if(m.fl==='O')anims.push({f:m.t+1,t:m.t-1});if(m.fl==='OO')anims.push({f:m.t-2,t:m.t+1});if(n.cap)(col(n.cap)==='w'?capW:capB).push(n.cap);n.hist=[...S.hist,key(n)];S=n;last=m;sel=-1;moveT=Date.now();n.cap?Sound.clack(1):Sound.card();
     const st=status(S);if(st){finish(st,mover);return}if(inCheck(S))say('chMsg',S.turn===my?'Check! Protect your king':'Check!',S.turn===my?'lose':'win');
     else say('chMsg',S.turn===my?'Your move':mode==='net'?`${esc(oppName)} is thinking…`:'The AI is thinking…');paint();
-    if(mode==='ai'&&playing&&S.turn!==my){thinking=true;setTimeout(()=>{const mv=aiMove(S,depth());thinking=false;if(playing&&mv)apply(mv)},550)}}
+    if(mode==='ai'&&playing&&S.turn!==my){thinking=true;setTimeout(()=>{const mv=aiMove(S,level());thinking=false;if(playing&&mv)apply(mv)},550)}}
   function finish(st,mover,how){playing=false;const c=conn;conn=null;if(c)setTimeout(()=>{try{c.close()}catch(e){}},1500);
     if(st==='mate'||st==='win'||st==='lose'){const iWon=st==='mate'?mover===my:st==='win';
       if(iWon){payout(stake*2,stake);say('chMsg',`${st==='mate'?'Checkmate! ':''}${how||''}You win! +${fmt(stake)}`,'win');Sound.big()}
@@ -3934,7 +3937,7 @@ const Chess=(()=>{
   $('chResign').addEventListener('click',()=>{if(!playing)return;if(mode==='net'&&conn)conn.send({t:'resign'});finish('lose',null,'You resigned. ')});
   // ---- online ----
   function setMode(m){if(playing||finder.busy())return;mode=m;document.querySelectorAll('#chMode button').forEach(b=>{const on=b.dataset.cm===m;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
-    $('chTitle').textContent=m==='net'?'Chess Online':'Chess vs AI';$('chHelp').textContent=m==='net'?'Play a real player 1 on 1. Colors are picked at random. You have 90 seconds per move or you lose. Checkmate wins 2× your bet, a draw gives your bet back, leaving loses.':'You play White against the AI (it plays stronger when you bet $1.000.000 or more). Tap a piece, then tap where it should go. Checkmate wins 2× your bet, a draw gives your bet back. Pawns that reach the end become queens.';
+    $('chTitle').textContent=m==='net'?'Chess Online':'Chess vs AI';$('chHelp').textContent=m==='net'?'Play a real player 1 on 1. Colors are picked at random. You have 90 seconds per move or you lose. Checkmate wins 2× your bet, a draw gives your bet back, leaving loses.':'You play White against the AI. The AI plays on Hard, and on Extreme when you bet $50.000.000 or more. Tap a piece, then tap where it should go. Checkmate wins 2× your bet, a draw gives your bet back. Pawns that reach the end become queens.';
     say('chMsg',m==='net'?'Pick a bet and press Queue to find a player':'Pick a bet and start a game');S=initial();last=null;paint()}
   document.querySelectorAll('#chMode button').forEach(b=>b.addEventListener('click',()=>{Sound.click();setMode(b.dataset.cm)}));
   function queue(){if(playing)return;if(money<bets.chess||money<1){say('chMsg','Not enough money for that bet','lose');return}
